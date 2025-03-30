@@ -1,0 +1,90 @@
+<!-- File upload input -->
+<input type="file" (change)="readFile($event)">
+
+<!-- Print Button -->
+<button (click)="printPage()" class="btn btn-success" style="margin-top: 20px;">
+  Print as PDF
+</button>
+
+<!-- PDF Preview Section -->
+<div *ngIf="pdfSrc" style="margin-top: 20px; text-align: center;">
+  <h5>PDF Preview</h5>
+  <iframe [src]="pdfSrc" width="30%" height="400px"></iframe>
+</div>
+<button (click)="togglePieChart()" class="btn btn-primary" style="margin-top: 20px;">
+  {{ showPieChart ? 'Hide Pie Chart' : 'Show Pie Chart' }}
+</button>
+
+<!-- Content to be printed -->
+<div id="printSection" *ngIf="clientData" style="margin-top: 20px; text-align: center;">
+  <h5>Client Information</h5>
+  <p><strong>Full Name:</strong> {{ clientData.fullName }}</p>
+
+  <!-- Button to toggle pie chart visibility -->
+ 
+
+  <!-- Pie chart display -->
+  <div *ngIf="showPieChart" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
+    <canvas baseChart #pieChartCanvas [data]="pieChartData" [type]="'pie'" [options]="pieChartOptions"
+      style="max-width: 250px; max-height: 250px;">
+    </canvas>
+  </div>
+
+  <!-- 🎨 Color-Coded Legend Below the Pie Chart -->
+  <div *ngIf="pieChartData.labels && pieChartData.labels.length" style="margin-top: 20px;">
+    <h5 style="text-align: center;">Legend</h5>
+    <ul style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center;">
+      <li *ngFor="let label of pieChartData.labels; let i = index"
+        style="display: flex; align-items: center; margin: 5px 10px;">
+        <span [style.backgroundColor]="legendColors[i]"
+          style="width: 20px; height: 20px; display: inline-block; margin-right: 10px; border-radius: 50%;"></span>
+        {{ label }}
+      </li>
+    </ul>
+  </div>
+
+  <!-- Color Counts -->
+  <div class="color-counts" style="margin-top: 40px; text-align: center;">
+    <h5>Color Counts</h5>
+    <ul style="list-style: none; padding: 0; display: flex; justify-content: center;">
+      <li *ngFor="let color of objectKeys(colorCounts)" style="margin: 0 15px;">
+        <span [style.backgroundColor]="color"
+          style="width: 20px; height: 20px; display: inline-block; border-radius: 50%; margin-right: 10px;"></span>
+        {{ color | titlecase }}: {{ colorCounts[color] }} ({{ calculatePercentage(colorCounts[color]) }}%)
+      </li>
+    </ul>
+  </div>
+
+
+  <!-- Bootstrap Cards for Causes -->
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-12">
+        <div *ngFor="let causeGroup of getSortedCauses()">
+          <mat-card class="cause-card">
+            <mat-card-header>
+              <mat-card-title>{{ causeGroup.cause }}</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <ul>
+                <li *ngFor="let item of causeGroup.items" [style.color]="item.color">
+                  <strong>{{ item.code }}</strong> - {{ item.name }} - {{ item.percentage }}%
+                </li>
+              </ul>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for showing detailed information about the selected record -->
+<div *ngIf="selectedExcelRecord;">
+  <div>
+    <h4>Details for {{ selectedExcelRecord.rahId }}</h4>
+    <p><strong>Category:</strong> {{ selectedExcelRecord.category }}</p>
+    <p><strong>Details:</strong> {{ selectedExcelRecord.details }}</p>
+    <p><strong>RAH ID:</strong> {{ selectedExcelRecord.rahId }}</p>
+  </div>
+</div>

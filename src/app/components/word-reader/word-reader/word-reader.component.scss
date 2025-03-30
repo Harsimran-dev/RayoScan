@@ -1,0 +1,114 @@
+/* General Styles */
+.container {
+  max-width: 90%;
+  margin: auto;
+}
+
+h5 {
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Button Styling */
+button {
+  display: block;
+  margin: 20px auto;
+}
+
+/* Pie Chart Styling */
+canvas {
+  max-width: 250px;
+  max-height: 250px;
+}
+
+/* 🎨 Color-Coded Legend */
+.legend-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.legend-container ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.legend-container li {
+  display: flex;
+  align-items: center;
+  margin: 5px 10px;
+}
+
+.legend-container span {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin-right: 10px;
+  border-radius: 50%;
+}
+
+/* 🟢 Color-Coded Cause Cards */
+.cause-card {
+  margin: 10px;
+  border-radius: 10px;
+  transition: box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.cause-card:hover {
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Cause List */
+.cause-card ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.cause-card li {
+  padding: 8px;
+  border-bottom: 1px solid #e0e0e0;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cause-card li:last-child {
+  border-bottom: none;
+}
+
+/* 🚀 Dynamic Colors for Frequency Groups */
+.red-text { color: red !important; }
+.blue-text { color: blue !important; }
+.green-text { color: green !important; }
+.orange-text { color: orange !important; }
+
+/* Hover Effect */
+.cause-card li:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Modal Styling */
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.modal-container h4 {
+  margin-bottom: 15px;
+}
+
+.modal-container button {
+  display: block;
+  margin: 10px auto;
+}
