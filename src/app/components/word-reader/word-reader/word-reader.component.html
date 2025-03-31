@@ -66,7 +66,7 @@
           <mat-card class="cause-card">
             <!-- Toggle Cause Group Details -->
             <mat-card-header (click)="toggleCauseDetails(causeGroup)" style="cursor: pointer;">
-              <mat-card-title>
+              <mat-card-title [style.color]="causeGroup.items[0]?.color"> <!-- Bind color here -->
                 {{ causeGroup.cause }}
                 <span style="float: right;">
                   <mat-icon>{{ causeGroup.showDetails ? 'expand_less' : 'expand_more' }}</mat-icon>
