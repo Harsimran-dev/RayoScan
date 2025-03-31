@@ -15,11 +15,17 @@ button {
   margin: 20px auto;
 }
 
+
 /* Pie Chart Styling */
 canvas {
   max-width: 250px;
   max-height: 250px;
 }
+.custom-container {
+  max-width: 900px;  /* Set the desired width */
+  margin: 0 auto;  /* Center it horizontally */
+}
+
 
 /* 🎨 Color-Coded Legend */
 .legend-container {

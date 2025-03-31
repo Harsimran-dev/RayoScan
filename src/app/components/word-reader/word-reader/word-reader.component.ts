@@ -17,13 +17,15 @@ export class WordReaderComponent implements AfterViewInit {
   @ViewChild('pieChartCanvas') pieChartCanvas: any;
   colorCounts: { [color: string]: number } = {};
   clientData: any;
-  
+  showPieChart: boolean = false;
+  showPdfPreview: boolean = false;
+  causeGroups: any[] = [];
 
   extractedCodes: string[] = [];
   causeCounts: { [key: string]: number } = {};
   causeCodes: { [key: string]: { code: string, name: string, percentage: number, color: string }[] } = {};  
   legendColors: string[] = [];
-  showPieChart: boolean = false;
+
   causeDetailsVisibility: { [key: string]: boolean } = {};  
   selectedExcelRecord: any = null;  
   objectKeys = Object.keys;
@@ -52,7 +54,7 @@ export class WordReaderComponent implements AfterViewInit {
     },
   };
 
-  constructor(public dialog: MatDialog,  private cdRef: ChangeDetectorRef,private sanitizer: DomSanitizer) {}
+  constructor(public dialog: MatDialog,  private cdRef: ChangeDetectorRef,private sanitizer: DomSanitizer,private cdr: ChangeDetectorRef) {}
 
   async readFile(event: any) {
     const file = event.target.files[0];
@@ -206,6 +208,9 @@ export class WordReaderComponent implements AfterViewInit {
     this.showPieChart = true;
     this.updatePieChart();
   }
+  toggleCause(index: number) {
+    this.causeGroups[index].showDetails = !this.causeGroups[index].showDetails;
+  }
   printPage() {
     const printContent = document.getElementById('printSection');
     const printWindow = window.open('', '', 'height=600,width=800');
@@ -264,11 +269,19 @@ export class WordReaderComponent implements AfterViewInit {
   
   
 
-  toggleCauseDetails(cause: string) {
-    this.causeDetailsVisibility[cause] = !this.causeDetailsVisibility[cause];
-  }
 
-  getSortedCauses(): { cause: string, items: any[] }[] {
+  
+
+  toggleCauseDetails(causeGroup: any) {
+    // Toggle the showDetails property for the clicked cause group
+    causeGroup.showDetails = !causeGroup.showDetails;
+    console.log(causeGroup.showDetails);
+    console.log("Toggled cause group details:", causeGroup); // Debugging
+    this.cdr.detectChanges();
+
+  }
+  
+  getSortedCauses(): { cause: string, items: any[], showDetails: boolean }[] {
     const colorTotals: { [color: string]: number } = { red: 0, blue: 0, green: 0, orange: 0 };
   
     // Calculate total percentage per color
@@ -278,34 +291,32 @@ export class WordReaderComponent implements AfterViewInit {
       });
     }
   
-    console.log("🎨 Total Percentage by Color:", colorTotals); // Debugging
-  
     // Sort colors by total percentage in descending order
     const sortedColors = Object.entries(colorTotals)
       .sort(([, totalA], [, totalB]) => totalB - totalA)
       .map(([color]) => color);
   
-    console.log("📌 Sorted Colors:", sortedColors); // Debugging
-  
-    // Group causes by color without duplicates
-    const colorGroupedCauses: { [color: string]: { cause: string, items: any[] }[] } = {};
-    const seenCauses = new Set(); // 🛑 Prevents duplicates
+    // Group causes by color
+    const colorGroupedCauses: { [color: string]: { cause: string, items: any[], showDetails: boolean }[] } = {};
+    const seenCauses = new Set();
   
     for (const cause in this.causeCodes) {
       if (!seenCauses.has(cause)) {
         const causeItems = this.causeCodes[cause];
-        const firstItemColor = causeItems[0].color; // Assume first item's color as group color
-        
+        const firstItemColor = causeItems[0]?.color;
+  
         if (!colorGroupedCauses[firstItemColor]) {
           colorGroupedCauses[firstItemColor] = [];
         }
-        colorGroupedCauses[firstItemColor].push({ cause, items: causeItems });
-        seenCauses.add(cause); // ✅ Ensure no duplicate causes
+  
+        // Initialize showDetails for each cause group
+        colorGroupedCauses[firstItemColor].push({ cause, items: causeItems, showDetails: false });
+        seenCauses.add(cause);
       }
     }
   
-    // Arrange causes by highest color percentage first
-    const sortedCauses: { cause: string, items: any[] }[] = [];
+    // Sort causes by color and return them
+    const sortedCauses: { cause: string, items: any[], showDetails: boolean }[] = [];
     sortedColors.forEach(color => {
       if (colorGroupedCauses[color]) {
         sortedCauses.push(...colorGroupedCauses[color]);
@@ -313,6 +324,17 @@ export class WordReaderComponent implements AfterViewInit {
     });
   
     return sortedCauses;
+  }
+  trackByCause(index: number, causeGroup: any) {
+    return causeGroup.cause;  // Track by unique cause
+  }
+  
+  
+
+
+
+  togglePdfPreview() {
+    this.showPdfPreview = !this.showPdfPreview;
   }
   
   

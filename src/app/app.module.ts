@@ -17,6 +17,9 @@ import { WordReaderComponent } from './components/word-reader/word-reader/word-r
 import { CauseDialogComponent } from './components/cause-dialog/cause-dialog.component';
 import { RayoScanComponent } from './components/rayo-scan/rayo-scan.component';
 import { LineChartComponent } from './components/line-chart/line-chart.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatExpansionModule } from '@angular/material/expansion';  // For accordion and expansion panel
+
 
 
 @NgModule({
@@ -33,6 +36,9 @@ import { LineChartComponent } from './components/line-chart/line-chart.component
     AppRoutingModule,
     MatButtonModule,
     MatCardModule,
+    MatIconModule,
+    MatExpansionModule,
+    
 
     MatDialogModule, // Add MatDialogModule here
     NgChartsModule
