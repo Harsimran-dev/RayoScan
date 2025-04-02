@@ -352,18 +352,26 @@ export class WordReaderComponent implements AfterViewInit {
       (description: string | null) => { // Explicitly type 'description'
         if (description) {
           console.log("🚀 Fetched Description:", description);
-          this.selectedExcelRecord = { rahId, description }; // Store as an object
+          
+          // Append new description to the previous one
+          if (this.selectedExcelRecord) {
+            this.selectedExcelRecord.description += `\n\n${description}`; // Add new description below the previous one
+          } else {
+            this.selectedExcelRecord = { rahId, description }; // For the first cause, store it normally
+          }
+  
+          this.cdRef.detectChanges(); // Force UI update
         } else {
           console.warn("⚠️ No record found for RAH ID:", rahId);
           this.selectedExcelRecord = null;
         }
-        this.cdRef.detectChanges(); // Force UI update
       },
       (error: any) => { // Explicitly type 'error' as 'any'
         console.error("❌ Error fetching record:", error);
       }
     );
   }
+  
   
   
   

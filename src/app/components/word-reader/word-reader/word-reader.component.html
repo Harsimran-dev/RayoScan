@@ -98,14 +98,17 @@
   
 
 <!-- Modal for showing detailed information about the selected record -->
+<!-- Modal for showing detailed information about the selected record -->
 <div *ngIf="selectedExcelRecord" class="edit-description-container">
   <h3 class="description-title">Practitioner Comments</h3>
 
   <mat-form-field appearance="fill" class="description-field">
     <mat-label>Description</mat-label>
-    <textarea matInput [(ngModel)]="selectedExcelRecord.description" placeholder="Enter a detailed description here..."></textarea>
+    <textarea matInput [(ngModel)]="selectedExcelRecord.description" 
+              placeholder="Enter a detailed description here..."
+              class="auto-expand-textarea"></textarea>
   </mat-form-field>
 
   <!-- Save Button -->
-
 </div>
+
