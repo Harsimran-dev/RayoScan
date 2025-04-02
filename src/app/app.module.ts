@@ -8,9 +8,13 @@ import { AppComponent } from './app.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog'; // Import MatDialogModule
+import { MatFormFieldModule } from '@angular/material/form-field'; // Import MatFormFieldModule
+import { MatInputModule } from '@angular/material/input'; // Import MatInputModule
+
 
 // Chart Module
 import { NgChartsModule } from 'ng2-charts';
+import { FormsModule } from '@angular/forms'; 
 
 // Components
 import { WordReaderComponent } from './components/word-reader/word-reader/word-reader.component';
@@ -38,6 +42,9 @@ import { MatExpansionModule } from '@angular/material/expansion';  // For accord
     MatCardModule,
     MatIconModule,
     MatExpansionModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
     
 
     MatDialogModule, // Add MatDialogModule here

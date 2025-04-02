@@ -21,6 +21,11 @@
 <!-- Content to be printed -->
 <div id="printSection" *ngIf="clientData" style="margin-top: 20px; text-align: center;">
   <h5>Client Information</h5>
+  <!-- Displaying the extracted RAH ID -->
+<div *ngIf="rahIdNumber">
+  <p> ID: {{ rahIdNumber }}</p>
+</div>
+
   <p><strong>Full Name:</strong> {{ clientData.fullName }}</p>
 
   <!-- Button to toggle pie chart visibility -->
@@ -77,7 +82,7 @@
             <!-- Show Cause Group Details -->
             <mat-card-content [ngClass]="{'show-details': causeGroup.showDetails}">
               <ul>
-                <li *ngFor="let item of causeGroup.items" [style.color]="item.color">
+                <li *ngFor="let item of causeGroup.items" [style.color]="item.color" (click)="fetchExcelRecord(item.code)">
                   <strong>{{ item.code }}</strong> - {{ item.name }} - {{ item.percentage }}%
                 </li>
               </ul>
@@ -93,11 +98,14 @@
   
 
 <!-- Modal for showing detailed information about the selected record -->
-<div *ngIf="selectedExcelRecord;">
-  <div>
-    <h4>Details for {{ selectedExcelRecord.rahId }}</h4>
-    <p><strong>Category:</strong> {{ selectedExcelRecord.category }}</p>
-    <p><strong>Details:</strong> {{ selectedExcelRecord.details }}</p>
-    <p><strong>RAH ID:</strong> {{ selectedExcelRecord.rahId }}</p>
-  </div>
+<div *ngIf="selectedExcelRecord" class="edit-description-container">
+  <h3 class="description-title">Practitioner Comments</h3>
+
+  <mat-form-field appearance="fill" class="description-field">
+    <mat-label>Description</mat-label>
+    <textarea matInput [(ngModel)]="selectedExcelRecord.description" placeholder="Enter a detailed description here..."></textarea>
+  </mat-form-field>
+
+  <!-- Save Button -->
+
 </div>

@@ -6,6 +6,7 @@ import 'pdfjs-dist/build/pdf.worker.entry';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CAUSES_MAPPING } from 'src/causes/causes-mapping';
 import html2canvas from 'html2canvas';
+import { ExcelServiceService } from '../../excel-service.service';
 
 
 @Component({
@@ -18,6 +19,7 @@ export class WordReaderComponent implements AfterViewInit {
   colorCounts: { [color: string]: number } = {};
   clientData: any;
   showPieChart: boolean = false;
+  rahIdNumber: string | undefined;
   showPdfPreview: boolean = false;
   causeGroups: any[] = [];
 
@@ -54,7 +56,7 @@ export class WordReaderComponent implements AfterViewInit {
     },
   };
 
-  constructor(public dialog: MatDialog,  private cdRef: ChangeDetectorRef,private sanitizer: DomSanitizer,private cdr: ChangeDetectorRef) {}
+  constructor(private excelService: ExcelServiceService,public dialog: MatDialog,  private cdRef: ChangeDetectorRef,private sanitizer: DomSanitizer,private cdr: ChangeDetectorRef) {}
 
   async readFile(event: any) {
     const file = event.target.files[0];
@@ -105,6 +107,14 @@ export class WordReaderComponent implements AfterViewInit {
     this.processExtractedText(extractedText);
     const clientData = this.extractClientData(extractedText);
     console.log("Client Data:", clientData);
+    const fileName = file.name;
+    const rahIdMatch = fileName.match(/(\d{6}-\d{6})/); // Match pattern for numbers like 250202-180916
+  
+    if (rahIdMatch) {
+      const rahId = rahIdMatch[0]; // Extracted RAH ID
+      console.log("Extracted RAH ID:", rahId);
+      this.rahIdNumber = rahId; // Store the extracted RAH ID number in the variable
+    }
   }
 
   extractClientData(text: string) {
@@ -336,6 +346,25 @@ export class WordReaderComponent implements AfterViewInit {
   togglePdfPreview() {
     this.showPdfPreview = !this.showPdfPreview;
   }
+
+  fetchExcelRecord(rahId: string) {
+    this.excelService.searchRahId(rahId).subscribe(
+      (description: string | null) => { // Explicitly type 'description'
+        if (description) {
+          console.log("🚀 Fetched Description:", description);
+          this.selectedExcelRecord = { rahId, description }; // Store as an object
+        } else {
+          console.warn("⚠️ No record found for RAH ID:", rahId);
+          this.selectedExcelRecord = null;
+        }
+        this.cdRef.detectChanges(); // Force UI update
+      },
+      (error: any) => { // Explicitly type 'error' as 'any'
+        console.error("❌ Error fetching record:", error);
+      }
+    );
+  }
+  
   
   
   
