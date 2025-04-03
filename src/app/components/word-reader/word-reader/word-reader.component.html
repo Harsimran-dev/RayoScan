@@ -70,23 +70,25 @@
         <div *ngFor="let causeGroup of getSortedCauses(); let i = index; trackBy: trackByCause">
           <mat-card class="cause-card">
             <!-- Toggle Cause Group Details -->
-            <mat-card-header (click)="toggleCauseDetails(causeGroup)" style="cursor: pointer;">
+            <mat-card-header (click)="toggleCauseDetails(i)" style="cursor: pointer;">
               <mat-card-title [style.color]="causeGroup.items[0]?.color"> <!-- Bind color here -->
                 {{ causeGroup.cause }}
                 <span style="float: right;">
-                  <mat-icon>{{ causeGroup.showDetails ? 'expand_less' : 'expand_more' }}</mat-icon>
+                 
                 </span>
               </mat-card-title>
             </mat-card-header>
   
             <!-- Show Cause Group Details -->
-            <mat-card-content [ngClass]="{'show-details': causeGroup.showDetails}">
+            <mat-card-content *ngIf="expandedCauseGroup[i]">
               <ul>
-                <li *ngFor="let item of causeGroup.items" [style.color]="item.color" (click)="fetchExcelRecord(item.code)">
+                <li *ngFor="let item of causeGroup.items" [style.color]="item.color" (click)="fetchExcelRecord(item.code, item.name)">
                   <strong>{{ item.code }}</strong> - {{ item.name }} - {{ item.percentage }}%
                 </li>
               </ul>
             </mat-card-content>
+            
+            
           </mat-card>
         </div>
       </div>
@@ -102,13 +104,29 @@
 <div *ngIf="selectedExcelRecord" class="edit-description-container">
   <h3 class="description-title">Practitioner Comments</h3>
 
+  <!-- Display 100% Cause Name -->
+  <p *ngIf="selectedExcelRecord.name" class="cause-name">
+    <strong>100% Cause:</strong> {{ selectedExcelRecord.name }}
+  </p>
+
   <mat-form-field appearance="fill" class="description-field">
     <mat-label>Description</mat-label>
-    <textarea matInput [(ngModel)]="selectedExcelRecord.description" 
+    <textarea matInput [(ngModel)]="selectedExcelRecord.fullDescription" 
               placeholder="Enter a detailed description here..."
               class="auto-expand-textarea"></textarea>
   </mat-form-field>
+  <div class="container">
+    <ngx-signature-pad [config]="config" #testPad></ngx-signature-pad>
+  </div>
+  
+  <button (click)="clear()">clear</button>
+  <button (click)="getImage()" [disabled]="isInValid()">get image</button>
+  <button (click)="changeConfig()">change config</button>
+  <button (click)="forceReload()">forceReload</button>
+  
+ 
 
   <!-- Save Button -->
 </div>
+
 

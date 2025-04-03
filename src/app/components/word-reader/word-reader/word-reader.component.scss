@@ -25,6 +25,18 @@ button {
   margin: 20px auto;
 }
 
+/* Add this to your CSS */
+.cause-card .show-details {
+  display: block; /* Show details when class is added */
+}
+
+.cause-card .show-details {
+  display: none; /* Hide details by default */
+}
+
+
+
+
 
 /* Pie Chart Styling */
 canvas {

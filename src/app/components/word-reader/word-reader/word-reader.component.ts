@@ -7,6 +7,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CAUSES_MAPPING } from 'src/causes/causes-mapping';
 import html2canvas from 'html2canvas';
 import { ExcelServiceService } from '../../excel-service.service';
+import { NgxSignaturePadComponent, SignaturePadOptions } from '@o.krucheniuk/ngx-signature-pad';
 
 
 @Component({
@@ -15,6 +16,8 @@ import { ExcelServiceService } from '../../excel-service.service';
   styleUrls: ['./word-reader.component.scss']
 })
 export class WordReaderComponent implements AfterViewInit {
+  @ViewChild('testPad', { static: false }) signaturePadElement: NgxSignaturePadComponent;
+
   @ViewChild('pieChartCanvas') pieChartCanvas: any;
   colorCounts: { [color: string]: number } = {};
   clientData: any;
@@ -22,6 +25,7 @@ export class WordReaderComponent implements AfterViewInit {
   rahIdNumber: string | undefined;
   showPdfPreview: boolean = false;
   causeGroups: any[] = [];
+  expandedCauseGroup: boolean[] = [];
 
   extractedCodes: string[] = [];
   causeCounts: { [key: string]: number } = {};
@@ -72,6 +76,35 @@ export class WordReaderComponent implements AfterViewInit {
         console.warn("⚠️ Unsupported file format. Please upload a PDF.");
       }
     }
+  }
+  config: SignaturePadOptions = {
+    minWidth: 1,
+    maxWidth: 10,
+    penColor: "blue"
+  };
+  public clear() {
+    if (this.signaturePadElement) {
+      this.signaturePadElement.clear();
+    }
+  }
+  
+
+  public getImage() {
+    console.log(this.signaturePadElement.toDataURL());
+  }
+
+  public changeConfig() {
+    this.config.penColor = Math.random() >= 0.5 ? "black" : "red";
+    this.config.maxWidth = Math.random() * 10;
+    this.config = Object.assign({}, this.config);
+  }
+
+  public isInValid(): boolean {
+    return !(this.signaturePadElement && !this.signaturePadElement.isEmpty());
+  }
+
+  public forceReload() {
+    this.signaturePadElement.forceUpdate();
   }
   
   
@@ -175,6 +208,7 @@ export class WordReaderComponent implements AfterViewInit {
   processExtractedText(text: string) {
     const regex = /(\d{2}\.\d{2})\s+([\w\s,()\-\–]+?)\s+(\d{1,3})%/g;
 
+    const highPercentageRahIds: { rahId: string, name: string }[] = [];
 
     let match;
     const categoryCounts: { [key: string]: number } = {};
@@ -201,6 +235,10 @@ export class WordReaderComponent implements AfterViewInit {
       // 🔥 Ensure correct counting
       categoryCounts[cause] += 1;
       categoryCodes[cause].push({ code, name, percentage, color });
+      if (percentage === 100) {
+        highPercentageRahIds.push({ rahId: code, name });
+      }
+      
     }
   
     console.log("✅ Final Cause Counts:", JSON.stringify(categoryCounts, null, 2)); // Debugging: Ensure "Harmful substances" is counted
@@ -208,6 +246,10 @@ export class WordReaderComponent implements AfterViewInit {
     this.causeCounts = categoryCounts;
     this.causeCodes = categoryCodes;
     this.countColors();
+    highPercentageRahIds.forEach(record => this.fetchExcelRecord(record.rahId, record.name));
+
+
+    
   
     // Update Pie Chart
     this.pieChartData.labels = Object.keys(this.causeCounts);
@@ -282,14 +324,13 @@ export class WordReaderComponent implements AfterViewInit {
 
   
 
-  toggleCauseDetails(causeGroup: any) {
-    // Toggle the showDetails property for the clicked cause group
-    causeGroup.showDetails = !causeGroup.showDetails;
-    console.log(causeGroup.showDetails);
-    console.log("Toggled cause group details:", causeGroup); // Debugging
-    this.cdr.detectChanges();
-
+  toggleCauseDetails(index: number) {
+    // Toggle the expanded state for the given index
+    this.expandedCauseGroup[index] = !this.expandedCauseGroup[index];
+    console.log('Toggled cause group details:', this.expandedCauseGroup[index]);
+    this.cdr.detectChanges(); // Ensure changes are reflected in the UI
   }
+  
   
   getSortedCauses(): { cause: string, items: any[], showDetails: boolean }[] {
     const colorTotals: { [color: string]: number } = { red: 0, blue: 0, green: 0, orange: 0 };
@@ -347,31 +388,36 @@ export class WordReaderComponent implements AfterViewInit {
     this.showPdfPreview = !this.showPdfPreview;
   }
 
-  fetchExcelRecord(rahId: string) {
-    this.excelService.searchRahId(rahId).subscribe(
-      (description: string | null) => { // Explicitly type 'description'
-        if (description) {
-          console.log("🚀 Fetched Description:", description);
-          
-          // Append new description to the previous one
-          if (this.selectedExcelRecord) {
-            this.selectedExcelRecord.description += `\n\n${description}`; // Add new description below the previous one
-          } else {
-            this.selectedExcelRecord = { rahId, description }; // For the first cause, store it normally
-          }
-  
-          this.cdRef.detectChanges(); // Force UI update
+ fetchExcelRecord(rahId: string, name: string) {
+  this.excelService.searchRahId(rahId).subscribe(
+    (description: string | null) => { // Explicitly type 'description'
+      if (description) {
+        console.log("🚀 Fetched Description:", description);
+        
+        // Append new description and name to the previous one
+        if (this.selectedExcelRecord) {
+          // Append description and name
+          this.selectedExcelRecord.description += `\n\n${description}`;
+          this.selectedExcelRecord.name += `, ${name}`;
+          this.selectedExcelRecord.fullDescription = `${this.selectedExcelRecord.name}\n${this.selectedExcelRecord.description}`;
+         // Append the name
         } else {
-          console.warn("⚠️ No record found for RAH ID:", rahId);
-          this.selectedExcelRecord = null;
+          // For the first cause, store both name and description
+          this.selectedExcelRecord = { rahId, name, description };
         }
-      },
-      (error: any) => { // Explicitly type 'error' as 'any'
-        console.error("❌ Error fetching record:", error);
+
+        this.cdRef.detectChanges(); // Force UI update
+      } else {
+        console.warn("⚠️ No record found for RAH ID:", rahId);
+        this.selectedExcelRecord = null;
       }
-    );
-  }
-  
+    },
+    (error: any) => { // Explicitly type 'error' as 'any'
+      console.error("❌ Error fetching record:", error);
+    }
+  );
+}
+
   
   
   

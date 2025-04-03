@@ -10,6 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog'; // Import MatDialogModule
 import { MatFormFieldModule } from '@angular/material/form-field'; // Import MatFormFieldModule
 import { MatInputModule } from '@angular/material/input'; // Import MatInputModule
+import { NgxSignaturePadModule } from "@o.krucheniuk/ngx-signature-pad";
 
 
 // Chart Module
@@ -43,6 +44,8 @@ import { MatExpansionModule } from '@angular/material/expansion';  // For accord
     MatIconModule,
     MatExpansionModule,
     MatFormFieldModule,
+    NgxSignaturePadModule,
+ 
     MatInputModule,
     FormsModule,
     
