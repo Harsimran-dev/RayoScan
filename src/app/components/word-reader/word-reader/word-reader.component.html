@@ -22,14 +22,14 @@
 <div id="printSection" *ngIf="clientData" style="margin-top: 20px; text-align: center;">
   <h5>Client Information</h5>
   <!-- Displaying the extracted RAH ID -->
-<div *ngIf="rahIdNumber">
-  <p> ID: {{ rahIdNumber }}</p>
-</div>
+  <div *ngIf="rahIdNumber">
+    <p> ID: {{ rahIdNumber }}</p>
+  </div>
 
   <p><strong>Full Name:</strong> {{ clientData.fullName }}</p>
 
   <!-- Button to toggle pie chart visibility -->
- 
+
 
   <!-- Pie chart display -->
   <div *ngIf="showPieChart" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
@@ -74,59 +74,58 @@
               <mat-card-title [style.color]="causeGroup.items[0]?.color"> <!-- Bind color here -->
                 {{ causeGroup.cause }}
                 <span style="float: right;">
-                 
+
                 </span>
               </mat-card-title>
             </mat-card-header>
-  
+
             <!-- Show Cause Group Details -->
             <mat-card-content *ngIf="expandedCauseGroup[i]">
               <ul>
-                <li *ngFor="let item of causeGroup.items" [style.color]="item.color" (click)="fetchExcelRecord(item.code, item.name)">
+                <li *ngFor="let item of causeGroup.items" [style.color]="item.color"
+                  (click)="fetchExcelRecord(item.code, item.name)">
                   <strong>{{ item.code }}</strong> - {{ item.name }} - {{ item.percentage }}%
                 </li>
               </ul>
             </mat-card-content>
-            
-            
+
+
           </mat-card>
         </div>
       </div>
     </div>
   </div>
-  
-  
-  
-  
 
-<!-- Modal for showing detailed information about the selected record -->
-<!-- Modal for showing detailed information about the selected record -->
-<div *ngIf="selectedExcelRecord" class="edit-description-container">
-  <h3 class="description-title">Practitioner Comments</h3>
 
-  <!-- Display 100% Cause Name -->
-  <p *ngIf="selectedExcelRecord.name" class="cause-name">
-    <strong>100% Cause:</strong> {{ selectedExcelRecord.name }}
-  </p>
 
-  <mat-form-field appearance="fill" class="description-field">
-    <mat-label>Description</mat-label>
-    <textarea matInput [(ngModel)]="selectedExcelRecord.fullDescription" 
-              placeholder="Enter a detailed description here..."
-              class="auto-expand-textarea"></textarea>
-  </mat-form-field>
-  <div class="container">
-    <ngx-signature-pad [config]="config" #testPad></ngx-signature-pad>
+
+
+  <!-- Modal for showing detailed information about the selected record -->
+  <!-- Modal for showing detailed information about the selected record -->
+  <div *ngIf="selectedExcelRecord" class="edit-description-container">
+    <h3 class="description-title">Practitioner Comments</h3>
+
+    <!-- Display 100% Cause Name -->
+    <p *ngIf="selectedExcelRecord.name" class="cause-name">
+      <strong>100% Cause:</strong> {{ selectedExcelRecord.name }}
+    </p>
+
+    <mat-form-field appearance="fill" class="description-field">
+      <mat-label>Description</mat-label>
+      <textarea matInput [(ngModel)]="selectedExcelRecord.fullDescription"
+        placeholder="Enter a detailed description here..." class="auto-expand-textarea"></textarea>
+    </mat-form-field>
+    <div class="container">
+      <ngx-signature-pad [config]="config" #testPad></ngx-signature-pad>
+    </div>
   </div>
-  
-  <button (click)="clear()">clear</button>
-  <button (click)="getImage()" [disabled]="isInValid()">get image</button>
-  <button (click)="changeConfig()">change config</button>
-  <button (click)="forceReload()">forceReload</button>
-  
- 
-
-  <!-- Save Button -->
 </div>
 
+<button (click)="clear()">clear</button>
 
+<button (click)="changeConfig()">change config</button>
+
+
+
+
+<!-- Save Button -->

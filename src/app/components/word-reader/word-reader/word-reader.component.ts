@@ -266,31 +266,55 @@ export class WordReaderComponent implements AfterViewInit {
   printPage() {
     const printContent = document.getElementById('printSection');
     const printWindow = window.open('', '', 'height=600,width=800');
-
+  
     if (printContent) {
-      // Capture the pie chart canvas as an image using html2canvas
+      // Convert textareas into divs before capturing the screenshot
+      const textareas = printContent.querySelectorAll('textarea');
+      const textareaReplacements: { element: HTMLTextAreaElement; div: HTMLDivElement }[] = [];
+  
+      textareas.forEach((textarea) => {
+        const div = document.createElement('div');
+        div.textContent = textarea.value;
+        div.style.cssText = window.getComputedStyle(textarea).cssText; // Copy styles
+        div.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
+  
+        textarea.parentNode?.replaceChild(div, textarea);
+        textareaReplacements.push({ element: textarea, div });
+      });
+  
+      // Capture full section including images, charts, and signature pad
       html2canvas(printContent).then((canvas) => {
-        // Convert canvas to image
         const image = canvas.toDataURL('image/png');
-
-        // Open the print window and add the content
+  
+        // Restore textareas after capture
+        textareaReplacements.forEach(({ element, div }) => {
+          div.parentNode?.replaceChild(element, div);
+        });
+  
+        // Open new print window and include the captured image
         printWindow?.document.write('<html><head><title>Print</title><style>');
         printWindow?.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
         printWindow?.document.write('h5 { color: #333; }');
         printWindow?.document.write('</style></head><body>');
-        
-        // Write the pie chart as an image
-        printWindow?.document.write('<img src="' + image + '" alt="Pie Chart" style="width: 100%; max-width: 600px; margin-bottom: 20px;" />');
-        
-        // Write the rest of the content
-        printWindow?.document.write(printContent.innerHTML || '');
+  
+        // Insert the captured section as an image
+        printWindow?.document.write('<img src="' + image + '" alt="Captured Content" style="width: 100%; max-width: 800px; margin-bottom: 20px;" />');
+  
+        // Append the original HTML content (to ensure all text & details are visible)
+        printWindow?.document.write('<div>' + printContent.innerHTML + '</div>');
+  
+        // Explicitly add textarea content (since it’s not captured by html2canvas)
+        textareas.forEach((textarea) => {
+          printWindow?.document.write('<p><strong>' + (textarea.placeholder || 'Description') + ':</strong><br>' + textarea.value.replace(/\n/g, '<br>') + '</p>');
+        });
+  
         printWindow?.document.write('</body></html>');
-        
         printWindow?.document.close();
         printWindow?.print();
       });
     }
   }
+  
   
   
   
