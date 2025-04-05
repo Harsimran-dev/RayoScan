@@ -26,6 +26,8 @@ export class WordReaderComponent implements AfterViewInit {
   showPdfPreview: boolean = false;
   causeGroups: any[] = [];
   expandedCauseGroup: boolean[] = [];
+  showRootCauses = true; // default to visible
+
 
   extractedCodes: string[] = [];
   causeCounts: { [key: string]: number } = {};
@@ -107,6 +109,12 @@ export class WordReaderComponent implements AfterViewInit {
     this.signaturePadElement.forceUpdate();
   }
   
+ngOnInit(): void {
+  const causeCount = this.getSortedCauses().length;
+  console.log(this.expandedCauseGroup)
+  this.expandedCauseGroup = new Array(causeCount).fill(true);
+}
+
   
 
   resetData() {
@@ -120,6 +128,7 @@ export class WordReaderComponent implements AfterViewInit {
   }
 
   async readPDF(file: File) {
+  
     const reader = new FileReader();
     const arrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
       reader.onload = () => resolve(reader.result as ArrayBuffer);
@@ -148,43 +157,57 @@ export class WordReaderComponent implements AfterViewInit {
       console.log("Extracted RAH ID:", rahId);
       this.rahIdNumber = rahId; // Store the extracted RAH ID number in the variable
     }
+    const causeCount = this.getSortedCauses().length;
+    console.log(this.expandedCauseGroup)
+    this.expandedCauseGroup = new Array(causeCount).fill(true);
   }
 
   extractClientData(text: string) {
     // Adjusted regex patterns
     const namePattern = /Rayoscan\s*-\s*RAH\s*Scan\s*-\s*([A-Za-z\s]+)\s*Client\s*data/;
     const surnamePattern = /Surname:\s*([A-Za-z\s\-]+)\s*First\s*name:\s*([A-Za-z\s\-]+)/;
-    const dobPattern = /Date\s*of\s*birth:\s*(\d{2}\.\d{2}\.\d{4})/;
+    const dobPattern = /Date\s*of\s*birth:\s*(\d{1,2}\.\d{1,2}\.\d{4})/;
   
-    // Test for matches based on the adjusted pattern
+    // Test for matches
     const nameMatch = text.match(namePattern);
     const surnameFirstNameMatch = text.match(surnamePattern);
     const dobMatch = text.match(dobPattern);
   
-    // Extract the values if available
+    // Extract the values
     const fullName = nameMatch ? nameMatch[1].trim() : null;
     const surname = surnameFirstNameMatch ? surnameFirstNameMatch[1].trim() : null;
     const firstName = surnameFirstNameMatch ? surnameFirstNameMatch[2].trim() : null;
     const dateOfBirth = dobMatch ? dobMatch[1].trim() : null;
   
-    // Parse Date of Birth into a Date object, if available
-    let parsedDateOfBirth = null;
+    // Helper function to format the date to yyyy-mm-dd (without time)
+    const formatDate = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure 2 digits
+      const day = String(date.getDate()).padStart(2, '0'); // Ensure 2 digits
+      return `${year}-${month}-${day}`;
+    };
+  
+    // Parse Date of Birth
+    let parsedDateOfBirth: Date | null = null;
+    let formattedDob: string | null = null;
     if (dateOfBirth) {
-      const [day, month, year] = dateOfBirth.split('.'); // Split the date string
-      parsedDateOfBirth = new Date(`${year}-${month}-${day}`); // Convert to Date format (yyyy-MM-dd)
+      const [day, month, year] = dateOfBirth.split('.');
+      parsedDateOfBirth = new Date(Number(year), Number(month) - 1, Number(day)); // Properly create Date object
+      formattedDob = formatDate(parsedDateOfBirth); // Format date to yyyy-mm-dd
     }
   
-    // Store the extracted data into clientData
+    // Store the extracted data
     this.clientData = {
       fullName,
       surname,
       firstName,
-      dateOfBirth: parsedDateOfBirth, // Return parsed Date object
+      dateOfBirth: formattedDob, // Only store formatted date as string
     };
-
-    // Log the final extracted values
+  
+    // Log for verification
     console.log("Extracted Client Data:", this.clientData);
   }
+  
   
   
   countColors() {
@@ -267,51 +290,39 @@ export class WordReaderComponent implements AfterViewInit {
     const printContent = document.getElementById('printSection');
     const printWindow = window.open('', '', 'height=600,width=800');
   
-    if (printContent) {
-      // Convert textareas into divs before capturing the screenshot
+    if (printContent && printWindow) {
+      // Convert textareas to divs for printing (keep styles)
       const textareas = printContent.querySelectorAll('textarea');
-      const textareaReplacements: { element: HTMLTextAreaElement; div: HTMLDivElement }[] = [];
+      const replacements: { original: HTMLTextAreaElement; replacement: HTMLDivElement }[] = [];
   
       textareas.forEach((textarea) => {
         const div = document.createElement('div');
         div.textContent = textarea.value;
-        div.style.cssText = window.getComputedStyle(textarea).cssText; // Copy styles
-        div.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
+        div.style.cssText = window.getComputedStyle(textarea).cssText;
+        div.style.whiteSpace = 'pre-wrap';
   
         textarea.parentNode?.replaceChild(div, textarea);
-        textareaReplacements.push({ element: textarea, div });
+        replacements.push({ original: textarea, replacement: div });
       });
   
-      // Capture full section including images, charts, and signature pad
-      html2canvas(printContent).then((canvas) => {
-        const image = canvas.toDataURL('image/png');
+      // Print the modified HTML (without screenshot and without duplication)
+      printWindow.document.write('<html><head><title>Print</title><style>');
+      printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
+      printWindow.document.write('h5 { color: #333; }');
+      printWindow.document.write('</style></head><body>');
+      printWindow.document.write(printContent.innerHTML);
+      printWindow.document.write('</body></html>');
+      printWindow.document.close();
   
-        // Restore textareas after capture
-        textareaReplacements.forEach(({ element, div }) => {
-          div.parentNode?.replaceChild(element, div);
-        });
-  
-        // Open new print window and include the captured image
-        printWindow?.document.write('<html><head><title>Print</title><style>');
-        printWindow?.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
-        printWindow?.document.write('h5 { color: #333; }');
-        printWindow?.document.write('</style></head><body>');
-  
-        // Insert the captured section as an image
-        printWindow?.document.write('<img src="' + image + '" alt="Captured Content" style="width: 100%; max-width: 800px; margin-bottom: 20px;" />');
-  
-        // Append the original HTML content (to ensure all text & details are visible)
-        printWindow?.document.write('<div>' + printContent.innerHTML + '</div>');
-  
-        // Explicitly add textarea content (since it’s not captured by html2canvas)
-        textareas.forEach((textarea) => {
-          printWindow?.document.write('<p><strong>' + (textarea.placeholder || 'Description') + ':</strong><br>' + textarea.value.replace(/\n/g, '<br>') + '</p>');
-        });
-  
-        printWindow?.document.write('</body></html>');
-        printWindow?.document.close();
-        printWindow?.print();
+      // Restore original textareas after print content is copied
+      replacements.forEach(({ original, replacement }) => {
+        replacement.parentNode?.replaceChild(original, replacement);
       });
+  
+      // Wait a moment before printing
+      setTimeout(() => {
+        printWindow.print();
+      }, 500);
     }
   }
   
@@ -412,36 +423,72 @@ export class WordReaderComponent implements AfterViewInit {
     this.showPdfPreview = !this.showPdfPreview;
   }
 
- fetchExcelRecord(rahId: string, name: string) {
-  this.excelService.searchRahId(rahId).subscribe(
-    (description: string | null) => { // Explicitly type 'description'
-      if (description) {
-        console.log("🚀 Fetched Description:", description);
-        
-        // Append new description and name to the previous one
-        if (this.selectedExcelRecord) {
-          // Append description and name
-          this.selectedExcelRecord.description += `\n\n${description}`;
-          this.selectedExcelRecord.name += `, ${name}`;
-          this.selectedExcelRecord.fullDescription = `${this.selectedExcelRecord.name}\n${this.selectedExcelRecord.description}`;
-         // Append the name
+  fetchExcelRecord(rahId: string, name: string) {
+    this.excelService.searchRahId(rahId).subscribe(
+      (description: string | null) => {
+        if (description) {
+          console.log("🚀 Fetched Description:", description);
+  
+          // 🧠 Sort colors by count in descending order
+          const sortedColors = Object.entries(this.colorCounts)
+            .sort((a, b) => b[1] - a[1])
+            .map(entry => entry[0]);
+  
+          const dominantColor = sortedColors[0] || '';
+          const secondDominantColor = sortedColors[1] || '';
+  
+          // 📌 Helper function to get causes for a color
+          const getCausesForColor = (color: string): string[] => {
+            return Object.entries(this.causeCodes)
+              .filter(([cause, items]) => items.some(item => item.color === color))
+              .map(([cause]) => cause);
+          };
+  
+          const dominantCauses = getCausesForColor(dominantColor);
+          const secondDominantCauses = getCausesForColor(secondDominantColor);
+  
+          // 🎨 Color summary block (added only once at the end)
+          const colorBlock =
+            `There is also an energy imbalance in the following area:\n\n` +
+            `🎨 Most Dominant Color: ${dominantColor.toUpperCase()}\n` +
+            `📚 Related Causes: ${dominantCauses.join(', ') || 'N/A'}\n\n` +
+            `🎨 Second Most Dominant Color: ${secondDominantColor.toUpperCase()}\n` +
+            `📚 Related Causes: ${secondDominantCauses.join(', ') || 'N/A'}\n\n`;
+  
+          // 🧾 Description entry without repeating color block
+          const newEntry =
+            `The detailed scan shows high energetic imbalances in:\n\n` +
+            `**CAUSE:** ${name.toUpperCase()}\n` +
+            `📝 Description: ${description}\n=========================\n\n`;
+  
+          // 📦 Append to selected record
+          if (this.selectedExcelRecord) {
+            this.selectedExcelRecord.fullDescription += `\n${newEntry}`;
+          } else {
+            this.selectedExcelRecord = {
+              rahId,
+              name,
+              description,
+              fullDescription: newEntry
+            };
+          }
+  
+          // ✅ Add color block only once at the end
+          if (!this.selectedExcelRecord.fullDescription.includes('Most Dominant Color')) {
+            this.selectedExcelRecord.fullDescription += colorBlock;
+          }
+  
+          this.cdRef.detectChanges();
         } else {
-          // For the first cause, store both name and description
-          this.selectedExcelRecord = { rahId, name, description };
+          console.warn("⚠️ No record found for RAH ID:", rahId);
+          this.selectedExcelRecord = null;
         }
-
-        this.cdRef.detectChanges(); // Force UI update
-      } else {
-        console.warn("⚠️ No record found for RAH ID:", rahId);
-        this.selectedExcelRecord = null;
+      },
+      (error: any) => {
+        console.error("❌ Error fetching record:", error);
       }
-    },
-    (error: any) => { // Explicitly type 'error' as 'any'
-      console.error("❌ Error fetching record:", error);
-    }
-  );
-}
-
+    );
+  }
   
   
   

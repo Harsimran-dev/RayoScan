@@ -1,7 +1,5 @@
-<!-- File upload input -->
 <input type="file" (change)="readFile($event)">
 
-<!-- Print Button -->
 <button (click)="printPage()" class="btn btn-success" style="margin-top: 20px;">
   Print as PDF
 </button>
@@ -9,7 +7,6 @@
   {{ showPdfPreview ? 'Hide PDF Preview' : 'Show PDF Preview' }}
 </button>
 
-<!-- PDF Preview Section -->
 <div *ngIf="showPdfPreview && pdfSrc" style="margin-top: 20px; text-align: center;">
   <h5>PDF Preview</h5>
   <iframe [src]="pdfSrc" width="50%" height="600px"></iframe>
@@ -17,28 +14,32 @@
 <button (click)="togglePieChart()" class="btn btn-primary" style="margin-top: 20px;">
   {{ showPieChart ? 'Hide Pie Chart' : 'Show Pie Chart' }}
 </button>
+<button mat-button (click)="showRootCauses = !showRootCauses" style="margin-bottom: 10px;">
+  {{ showRootCauses ? 'Hide Root Causes' : 'Show Root Causes' }}
+</button>
 
-<!-- Content to be printed -->
+
 <div id="printSection" *ngIf="clientData" style="margin-top: 20px; text-align: center;">
+<div style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
+  <img src="assets/rayosoft.jpg" alt="Logo" style="height: 80px;">
+</div>
+
   <h5>Client Information</h5>
-  <!-- Displaying the extracted RAH ID -->
   <div *ngIf="rahIdNumber">
     <p> ID: {{ rahIdNumber }}</p>
   </div>
 
   <p><strong>Full Name:</strong> {{ clientData.fullName }}</p>
+  <p><strong>Date of birth:</strong> {{ clientData.dateOfBirth }}</p>
 
-  <!-- Button to toggle pie chart visibility -->
 
 
-  <!-- Pie chart display -->
   <div *ngIf="showPieChart" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
     <canvas baseChart #pieChartCanvas [data]="pieChartData" [type]="'pie'" [options]="pieChartOptions"
       style="max-width: 250px; max-height: 250px;">
     </canvas>
   </div>
 
-  <!-- 🎨 Color-Coded Legend Below the Pie Chart -->
   <div *ngIf="showPieChart && pieChartData.labels && pieChartData.labels.length" style="margin-top: 20px;">
 
     <ul style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center;">
@@ -51,9 +52,8 @@
     </ul>
   </div>
 
-  <!-- Color Counts -->
-  <div class="color-counts" style="margin-top: 40px; text-align: center;">
-    <h5>Color Counts</h5>
+  <div *ngIf="showRootCauses" class="color-counts" style="margin-top: 40px; text-align: center;">
+    <h5>Root Causes</h5>
     <ul style="list-style: none; padding: 0; display: flex; justify-content: center;">
       <li *ngFor="let color of objectKeys(colorCounts)" style="margin: 0 15px;">
         <span [style.backgroundColor]="color"
@@ -62,6 +62,7 @@
       </li>
     </ul>
   </div>
+  
 
 
   <div class="container mt-4 custom-container">
@@ -69,9 +70,8 @@
       <div class="col-md-12">
         <div *ngFor="let causeGroup of getSortedCauses(); let i = index; trackBy: trackByCause">
           <mat-card class="cause-card">
-            <!-- Toggle Cause Group Details -->
             <mat-card-header (click)="toggleCauseDetails(i)" style="cursor: pointer;">
-              <mat-card-title [style.color]="causeGroup.items[0]?.color"> <!-- Bind color here -->
+              <mat-card-title [style.color]="causeGroup.items[0]?.color">
                 {{ causeGroup.cause }}
                 <span style="float: right;">
 
@@ -79,7 +79,6 @@
               </mat-card-title>
             </mat-card-header>
 
-            <!-- Show Cause Group Details -->
             <mat-card-content *ngIf="expandedCauseGroup[i]">
               <ul>
                 <li *ngFor="let item of causeGroup.items" [style.color]="item.color"
@@ -100,32 +99,56 @@
 
 
 
-  <!-- Modal for showing detailed information about the selected record -->
-  <!-- Modal for showing detailed information about the selected record -->
   <div *ngIf="selectedExcelRecord" class="edit-description-container">
     <h3 class="description-title">Practitioner Comments</h3>
 
-    <!-- Display 100% Cause Name -->
-    <p *ngIf="selectedExcelRecord.name" class="cause-name">
-      <strong>100% Cause:</strong> {{ selectedExcelRecord.name }}
-    </p>
+ 
+  
 
     <mat-form-field appearance="fill" class="description-field">
       <mat-label>Description</mat-label>
-      <textarea matInput [(ngModel)]="selectedExcelRecord.fullDescription"
-        placeholder="Enter a detailed description here..." class="auto-expand-textarea"></textarea>
+      <textarea
+        matInput
+        [(ngModel)]="selectedExcelRecord.fullDescription"
+      
+        class="auto-expand-textarea"
+        rows="10">
+      </textarea>
+   
     </mat-form-field>
-    <div class="container">
-      <ngx-signature-pad [config]="config" #testPad></ngx-signature-pad>
-    </div>
+    <mat-form-field appearance="fill" class="description-field">
+      <mat-label>Recommendations</mat-label>
+      <textarea
+        matInput
+        class="auto-expand-textarea"
+        rows="10"
+        readonly>
+    I would recommend that the client takes the following supplements:
+    
+    • Rayo Pure – This helps with removing harmful substances and parasites  
+    Recommended intake
+    
+    • Rayobase – This helps with controlling the acid levels (pH levels)  
+    Recommended intake
+    
+    • Rayovita – This helps support the vitamins trace element  
+    Recommended intake
+    
+    • Rayoflora – This helps by providing 13 different live good bacteria strands  
+    Recommended intake
+    
+    • Rayosole – This helps promote detoxification in the body  
+    Recommended intake
+      </textarea>
+    </mat-form-field>
+    
+    
+   
   </div>
 </div>
 
-<button (click)="clear()">clear</button>
-
-<button (click)="changeConfig()">change config</button>
 
 
 
 
-<!-- Save Button -->
+
