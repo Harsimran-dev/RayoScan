@@ -184,7 +184,7 @@ ngOnInit(): void {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure 2 digits
       const day = String(date.getDate()).padStart(2, '0'); // Ensure 2 digits
-      return `${year}-${month}-${day}`;
+      return `${day}-${month}-${year}`;
     };
   
     // Parse Date of Birth
@@ -447,23 +447,34 @@ ngOnInit(): void {
           const dominantCauses = getCausesForColor(dominantColor);
           const secondDominantCauses = getCausesForColor(secondDominantColor);
   
-          // 🎨 Color summary block (added only once at the end)
+          // 🎨 Color summary block
           const colorBlock =
-            `There is also an energy imbalance in the following area:\n\n` +
-            `🎨 Most Dominant Color: ${dominantColor.toUpperCase()}\n` +
-            `📚 Related Causes: ${dominantCauses.join(', ') || 'N/A'}\n\n` +
-            `🎨 Second Most Dominant Color: ${secondDominantColor.toUpperCase()}\n` +
-            `📚 Related Causes: ${secondDominantCauses.join(', ') || 'N/A'}\n\n`;
+          `There is also an energy imbalance in the following area:\n\n` +
+          `𝗠𝗼𝘀𝘁 𝗗𝗼𝗺𝗶𝗻𝗮𝗻𝘁 𝗖𝗼𝗹𝗼𝗿: ${dominantColor.toUpperCase()}\n` +  // Bold "Most Dominant Color"
+          `𝗥𝗲𝗹𝗮𝘁𝗲𝗱 𝗖𝗮𝘂𝘀𝗲𝘀: ${dominantCauses.join(', ') || 'N/A'}\n\n` +  // Bold "Related Causes"
+          `𝗦𝗲𝗰𝗼𝗻𝗱 𝗠𝗼𝘀𝘁 𝗗𝗼𝗺𝗶𝗻𝗮𝗻𝘁 𝗖𝗼𝗹𝗼𝗿: ${secondDominantColor.toUpperCase()}\n` +  // Bold "Second Most Dominant Color"
+          `𝗥𝗲𝗹𝗮𝘁𝗲𝗱 𝗖𝗮𝘂𝘀𝗲𝘀: ${secondDominantCauses.join(', ') || 'N/A'}\n\n`;  // Bold "Related Causes"
+        
   
-          // 🧾 Description entry without repeating color block
+          // 🧾 Description entry
           const newEntry =
-            `The detailed scan shows high energetic imbalances in:\n\n` +
-            `**CAUSE:** ${name.toUpperCase()}\n` +
-            `📝 Description: ${description}\n=========================\n\n`;
+          `The detailed scan shows high energetic imbalances in:\n\n` +
+          `𝗖𝗔𝗨𝗦𝗘: ${name.toUpperCase()}\n` +  // Bold "CAUSE"
+          ` Description: ${description}\n=========================\n\n`;
+        
+        
+        
   
           // 📦 Append to selected record
           if (this.selectedExcelRecord) {
-            this.selectedExcelRecord.fullDescription += `\n${newEntry}`;
+            // 🧹 Remove previous color block if already present
+            const colorBlockStart = 'There is also an energy imbalance in the following area:';
+            this.selectedExcelRecord.fullDescription = this.selectedExcelRecord.fullDescription
+              .split(colorBlockStart)[0]
+              .trim();
+  
+            // ➕ Add new cause description
+            this.selectedExcelRecord.fullDescription += `\n\n${newEntry}`;
           } else {
             this.selectedExcelRecord = {
               rahId,
@@ -473,10 +484,8 @@ ngOnInit(): void {
             };
           }
   
-          // ✅ Add color block only once at the end
-          if (!this.selectedExcelRecord.fullDescription.includes('Most Dominant Color')) {
-            this.selectedExcelRecord.fullDescription += colorBlock;
-          }
+          // ✅ Add color block at the very end
+          this.selectedExcelRecord.fullDescription += `\n\n${colorBlock}`;
   
           this.cdRef.detectChanges();
         } else {
@@ -489,6 +498,7 @@ ngOnInit(): void {
       }
     );
   }
+  
   
   
   

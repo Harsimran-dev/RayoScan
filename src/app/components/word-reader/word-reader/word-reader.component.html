@@ -23,6 +23,9 @@
 <div style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
   <img src="assets/rayosoft.jpg" alt="Logo" style="height: 80px;">
 </div>
+<div style="position: absolute; top: 100px; right: 20px; z-index: 1000;">
+  <img src="assets/logo2.jpg" alt="Logo" style="height: 80px;">
+</div>
 
   <h5>Client Information</h5>
   <div *ngIf="rahIdNumber">
@@ -99,8 +102,9 @@
 
 
 
-  <div *ngIf="selectedExcelRecord" class="edit-description-container">
-    <h3 class="description-title">Practitioner Comments</h3>
+  <div *ngIf="selectedExcelRecord" class="edit-description-container p-4 rounded-xl shadow-md bg-white">
+    <h5 class="text-sm font-semibold text-gray-700 mb-2 border-b pb-1">Practitioner Comments</h5>
+  
 
  
   
@@ -112,7 +116,8 @@
         [(ngModel)]="selectedExcelRecord.fullDescription"
       
         class="auto-expand-textarea"
-        rows="10">
+        rows="10"
+        style="background-color: white;">
       </textarea>
    
     </mat-form-field>
@@ -122,7 +127,7 @@
         matInput
         class="auto-expand-textarea"
         rows="10"
-        readonly>
+        style="background-color: white;">
     I would recommend that the client takes the following supplements:
     
     • Rayo Pure – This helps with removing harmful substances and parasites  
@@ -142,7 +147,15 @@
       </textarea>
     </mat-form-field>
     
-    
+    <!-- Signature Image -->
+<!-- Signature Image aligned to the left with reduced size -->
+<div style="margin-left: 0; text-align: left;">
+  <img src="assets/sign.jpg" alt="Signature" style="height: 30px; width: auto;">
+</div>
+
+
+
+
    
   </div>
 </div>
