@@ -9,7 +9,7 @@
 
 <div *ngIf="showPdfPreview && pdfSrc" style="margin-top: 20px; text-align: center;">
   <h5>PDF Preview</h5>
-  <iframe [src]="pdfSrc" width="60%" height="800px"></iframe>
+  <iframe [src]="pdfSrc" width="50%" height="1300px"></iframe>
 </div>
 <button (click)="togglePieChart()" class="btn btn-primary" style="margin-top: 20px;">
   {{ showPieChart ? 'Hide Pie Chart' : 'Show Pie Chart' }}
