@@ -291,7 +291,6 @@ ngOnInit(): void {
     const printWindow = window.open('', '', 'height=600,width=800');
   
     if (printContent && printWindow) {
-      // Convert textareas to divs for printing (keep styles)
       const textareas = printContent.querySelectorAll('textarea');
       const replacements: { original: HTMLTextAreaElement; replacement: HTMLDivElement }[] = [];
   
@@ -305,8 +304,10 @@ ngOnInit(): void {
         replacements.push({ original: textarea, replacement: div });
       });
   
-      // Print the modified HTML (without screenshot and without duplication)
-      printWindow.document.write('<html><head><title>Print</title><style>');
+      // Use rahIdNumber as title if available
+      const pdfTitle = this.rahIdNumber || 'Rayoscan_Report';
+  
+      printWindow.document.write(`<html><head><title>${pdfTitle}</title><style>`);
       printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
       printWindow.document.write('h5 { color: #333; }');
       printWindow.document.write('</style></head><body>');
@@ -314,17 +315,17 @@ ngOnInit(): void {
       printWindow.document.write('</body></html>');
       printWindow.document.close();
   
-      // Restore original textareas after print content is copied
+      // Restore original textareas
       replacements.forEach(({ original, replacement }) => {
         replacement.parentNode?.replaceChild(original, replacement);
       });
   
-      // Wait a moment before printing
       setTimeout(() => {
         printWindow.print();
       }, 500);
     }
   }
+  
   
   
   
