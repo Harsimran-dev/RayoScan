@@ -499,6 +499,29 @@ ngOnInit(): void {
       }
     );
   }
+
+  fetchExcelRecordPopup(rahId: string, name: string) {
+    this.excelService.searchRahId(rahId).subscribe(
+      (description: string | null) => {
+        if (description) {
+          const message =
+  `The detailed scan shows high energetic imbalances in:
+  
+  CAUSE: ${name.toUpperCase()}
+  Description: ${description}`;
+  
+          alert(message);
+        } else {
+          alert("No description found for RAH ID: " + rahId);
+        }
+      },
+      (error: any) => {
+        console.error("❌ Error fetching record:", error);
+        alert("Something went wrong. Please try again.");
+      }
+    );
+  }
+  
   
   
   

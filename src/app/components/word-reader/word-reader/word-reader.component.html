@@ -85,7 +85,7 @@
             <mat-card-content *ngIf="expandedCauseGroup[i]">
               <ul>
                 <li *ngFor="let item of causeGroup.items" [style.color]="item.color"
-                  (click)="fetchExcelRecord(item.code, item.name)">
+                (click)="fetchExcelRecordPopup(item.code, item.name)">
                   <strong>{{ item.code }}</strong> - {{ item.name }} - {{ item.percentage }}%
                 </li>
               </ul>
