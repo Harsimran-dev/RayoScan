@@ -25,6 +25,7 @@ export class WordReaderComponent implements AfterViewInit {
   rahIdNumber: string | undefined;
   showPdfPreview: boolean = false;
   causeGroups: any[] = [];
+  patientName:string | null;
   expandedCauseGroup: boolean[] = [];
   showRootCauses = true; // default to visible
 
@@ -175,6 +176,7 @@ ngOnInit(): void {
   
     // Extract the values
     const fullName = nameMatch ? nameMatch[1].trim() : null;
+    this.patientName=fullName;
     const surname = surnameFirstNameMatch ? surnameFirstNameMatch[1].trim() : null;
     const firstName = surnameFirstNameMatch ? surnameFirstNameMatch[2].trim() : null;
     const dateOfBirth = dobMatch ? dobMatch[1].trim() : null;
@@ -305,7 +307,9 @@ ngOnInit(): void {
       });
   
       // Use rahIdNumber as title if available
-      const pdfTitle = this.rahIdNumber || 'Rayoscan_Report';
+      const rahId = this.rahIdNumber || 'RAHID';
+      const patientName = this.patientName || 'Patient';
+      const pdfTitle = `${patientName}_${rahId}_Rayoscan_Report`;
   
       printWindow.document.write(`<html><head><title>${pdfTitle}</title><style>`);
       printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
