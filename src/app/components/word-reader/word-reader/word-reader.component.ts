@@ -431,7 +431,7 @@ ngOnInit(): void {
   fetchExcelRecord(rahId: string, name: string) {
     this.excelService.searchRahId(rahId).subscribe(
       (description: string | null) => {
-        if (description) {
+     
           console.log("🚀 Fetched Description:", description);
   
           // 🧠 Sort colors by count in descending order
@@ -493,10 +493,7 @@ ngOnInit(): void {
           this.selectedExcelRecord.fullDescription += `\n\n${colorBlock}`;
   
           this.cdRef.detectChanges();
-        } else {
-          console.warn("⚠️ No record found for RAH ID:", rahId);
-          this.selectedExcelRecord = null;
-        }
+        
       },
       (error: any) => {
         console.error("❌ Error fetching record:", error);
