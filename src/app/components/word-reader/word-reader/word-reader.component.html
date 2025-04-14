@@ -103,14 +103,21 @@
 
 
   <div *ngIf="selectedExcelRecord" class="edit-description-container p-4 rounded-xl shadow-md bg-white">
-    <h5 class="text-sm font-semibold text-gray-700 mb-2 border-b pb-1">Practitioner Comments</h5>
+    <h5 class="text-xl font-semibold text-gray-700 mb-2 border-b pb-1 underline">
+      Practitioner Comments
+    </h5>
+    
   
 
  
   
 
     <mat-form-field appearance="fill" class="description-field">
-      <mat-label>Description</mat-label>
+      <mat-label style="font-size: 18px; text-decoration: underline; margin-bottom: 8px; display: inline-block;">
+        Description
+      </mat-label>
+      
+
       <textarea
         matInput
         [(ngModel)]="selectedExcelRecord.fullDescription"

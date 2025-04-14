@@ -455,15 +455,15 @@ ngOnInit(): void {
           // 🎨 Color summary block
           const colorBlock =
           `There is also an energy imbalance in the following area:\n\n` +
-          `𝗠𝗼𝘀𝘁 𝗗𝗼𝗺𝗶𝗻𝗮𝗻𝘁 𝗖𝗼𝗹𝗼𝗿: ${dominantColor.toUpperCase()}\n` +  // Bold "Most Dominant Color"
+          ` ${dominantColor.toUpperCase()}\n` +  // Bold "Most Dominant Color"
           `𝗥𝗲𝗹𝗮𝘁𝗲𝗱 𝗖𝗮𝘂𝘀𝗲𝘀: ${dominantCauses.join(', ') || 'N/A'}\n\n` +  // Bold "Related Causes"
-          `𝗦𝗲𝗰𝗼𝗻𝗱 𝗠𝗼𝘀𝘁 𝗗𝗼𝗺𝗶𝗻𝗮𝗻𝘁 𝗖𝗼𝗹𝗼𝗿: ${secondDominantColor.toUpperCase()}\n` +  // Bold "Second Most Dominant Color"
+          ` ${secondDominantColor.toUpperCase()}\n` +  // Bold "Second Most Dominant Color"
           `𝗥𝗲𝗹𝗮𝘁𝗲𝗱 𝗖𝗮𝘂𝘀𝗲𝘀: ${secondDominantCauses.join(', ') || 'N/A'}\n\n`;  // Bold "Related Causes"
         
   
           // 🧾 Description entry
           const newEntry =
-          `The detailed scan shows high energetic imbalances in:\n\n` +
+          `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:\n\n` +
           `𝗖𝗔𝗨𝗦𝗘: ${name.toUpperCase()}\n` +  // Bold "CAUSE"
           ` Description: ${description}\n=========================\n\n`;
         
