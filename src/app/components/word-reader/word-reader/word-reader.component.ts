@@ -28,6 +28,7 @@ export class WordReaderComponent implements AfterViewInit {
   patientName:string | null;
   expandedCauseGroup: boolean[] = [];
   showRootCauses = true; // default to visible
+  rahHeaderSection: string = ""; 
 
 
   extractedCodes: string[] = [];
@@ -231,20 +232,40 @@ ngOnInit(): void {
   }
   
   processExtractedText(text: string) {
-    const regex = /(\d{2}\.\d{2})\s+([\w\s,()\-\–]+?)\s+(\d{1,3})%/g;
-
+    const regex = /(\d{2}\.\d{2})\s+([^\d%][^%]+?)\s+(\d{1,3})%/g;
+  
     const highPercentageRahIds: { rahId: string, name: string }[] = [];
-
-    let match;
     const categoryCounts: { [key: string]: number } = {};
     const categoryCodes: { [key: string]: { code: string, name: string, percentage: number, color: string }[] } = {};
   
-    console.log("📖 Extracted Text:\n", text); // Debugging: See full extracted text
+    let match;
+  
+    // ✅ Improved Smart Clean: Skip 'RAH 46.00...' header and start from first line with: XX.XX SomeName 100%
+   // Match the actual start of useful data
+// Match the actual start of useful data
+const actualStartMatch = text.match(/(\d{2}\.\d{2})\s+[^\d%]+\s+(\d{1,3})%/);
+
+if (actualStartMatch && actualStartMatch.index !== undefined) {
+  const headerPortion = text.substring(0, actualStartMatch.index);
+
+  // Match only the line that starts with "RAH" and ends before "No." or a newline
+  const rahLineMatch = headerPortion.match(/RAH\s+\d{2}\.\d{2}\s+(.+?)\s+(No\.|Program name|$)/);
+  if (rahLineMatch) {
+    const rahCleaned = ` ${rahLineMatch[0].split("No.")[0].trim()}`;
+    this.rahHeaderSection = rahCleaned;
+    console.log( this.rahHeaderSection)
+  }
+
+  text = text.substring(actualStartMatch.index);
+}
+
+
+
   
     while ((match = regex.exec(text)) !== null) {
-      const code = match[1]?.trim();  
-      const name = match[2]?.trim();  
-      const percentage = parseInt(match[3]);  
+      const code = match[1]?.trim();
+      const name = match[2]?.trim();
+      const percentage = parseInt(match[3]);
       const prefix = code.substring(0, 2);
   
       const cause = CAUSES_MAPPING[prefix] || "Unknown cause";
@@ -256,25 +277,22 @@ ngOnInit(): void {
         categoryCounts[cause] = 0;
         categoryCodes[cause] = [];
       }
-      
-      // 🔥 Ensure correct counting
+  
       categoryCounts[cause] += 1;
       categoryCodes[cause].push({ code, name, percentage, color });
+  
       if (percentage === 100) {
         highPercentageRahIds.push({ rahId: code, name });
       }
-      
     }
   
-    console.log("✅ Final Cause Counts:", JSON.stringify(categoryCounts, null, 2)); // Debugging: Ensure "Harmful substances" is counted
-  
+    // Assign to component properties
     this.causeCounts = categoryCounts;
     this.causeCodes = categoryCodes;
     this.countColors();
+  
+    // Fetch details for 100% entries
     highPercentageRahIds.forEach(record => this.fetchExcelRecord(record.rahId, record.name));
-
-
-    
   
     // Update Pie Chart
     this.pieChartData.labels = Object.keys(this.causeCounts);
@@ -285,6 +303,11 @@ ngOnInit(): void {
     this.showPieChart = true;
     this.updatePieChart();
   }
+  
+  
+  
+  
+  
   toggleCause(index: number) {
     this.causeGroups[index].showDetails = !this.causeGroups[index].showDetails;
   }
