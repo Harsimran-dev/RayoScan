@@ -8,6 +8,7 @@ import { CAUSES_MAPPING } from 'src/causes/causes-mapping';
 import html2canvas from 'html2canvas';
 import { ExcelServiceService } from '../../excel-service.service';
 import { NgxSignaturePadComponent, SignaturePadOptions } from '@o.krucheniuk/ngx-signature-pad';
+import { forkJoin } from 'rxjs';
 
 
 @Component({
@@ -24,6 +25,13 @@ export class WordReaderComponent implements AfterViewInit {
   showPieChart: boolean = false;
   rahIdNumber: string | undefined;
   showPdfPreview: boolean = false;
+  levelGroups: { [level: string]: string[] } = {
+    "VERY HIGH (80% - 100%)": [],
+    "HIGH (50% - 79%)": [],
+    "MODERATE (30% - 49%)": [],
+    "LOW (0% - 29%)": []
+  };
+  pendingRequests: number = 0;
   causeGroups: any[] = [];
   patientName:string | null;
   expandedCauseGroup: boolean[] = [];
@@ -234,7 +242,7 @@ ngOnInit(): void {
   processExtractedText(text: string) {
     const regex = /(\d{2}\.\d{2})\s+([^\d%][^%]+?)\s+(\d{1,3})%/g;
   
-    const highPercentageRahIds: { rahId: string, name: string }[] = [];
+    const highPercentageRahIds: { rahId: string, name: string ,percentage: number}[] = [];
     const categoryCounts: { [key: string]: number } = {};
     const categoryCodes: { [key: string]: { code: string, name: string, percentage: number, color: string }[] } = {};
   
@@ -281,9 +289,8 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       categoryCounts[cause] += 1;
       categoryCodes[cause].push({ code, name, percentage, color });
   
-      if (percentage === 100) {
-        highPercentageRahIds.push({ rahId: code, name });
-      }
+      highPercentageRahIds.push({ rahId: code, name, percentage });
+
     }
   
     // Assign to component properties
@@ -292,7 +299,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
     this.countColors();
   
     // Fetch details for 100% entries
-    highPercentageRahIds.forEach(record => this.fetchExcelRecord(record.rahId, record.name));
+    highPercentageRahIds.forEach(record => this.fetchExcelRecord(record.rahId, record.name, record.percentage));
   
     // Update Pie Chart
     this.pieChartData.labels = Object.keys(this.causeCounts);
@@ -451,78 +458,131 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
     this.showPdfPreview = !this.showPdfPreview;
   }
 
-  fetchExcelRecord(rahId: string, name: string) {
+  fetchExcelRecord(rahId: string, name: string, percentage: number) {
+    this.pendingRequests++;
+  
     this.excelService.searchRahId(rahId).subscribe(
       (description: string | null) => {
-     
-          console.log("🚀 Fetched Description:", description);
+        console.log("🚀 Fetched Description:", description);
   
-          // 🧠 Sort colors by count in descending order
-          const sortedColors = Object.entries(this.colorCounts)
-            .sort((a, b) => b[1] - a[1])
-            .map(entry => entry[0]);
+        // 🧠 Sort colors by count in descending order
+        const sortedColors = Object.entries(this.colorCounts)
+          .sort((a, b) => b[1] - a[1])
+          .map(entry => entry[0]);
   
-          const dominantColor = sortedColors[0] || '';
-          const secondDominantColor = sortedColors[1] || '';
+        const dominantColor = sortedColors[0] || '';
+        const secondDominantColor = sortedColors[1] || '';
   
-          // 📌 Helper function to get causes for a color
-          const getCausesForColor = (color: string): string[] => {
-            return Object.entries(this.causeCodes)
-              .filter(([cause, items]) => items.some(item => item.color === color))
-              .map(([cause]) => cause);
-          };
+        // 📌 Helper function to get causes for a color
+        const getCausesForColor = (color: string): string[] => {
+          return Object.entries(this.causeCodes)
+            .filter(([cause, items]) => items.some(item => item.color === color))
+            .map(([cause]) => cause);
+        };
   
-          const dominantCauses = getCausesForColor(dominantColor);
-          const secondDominantCauses = getCausesForColor(secondDominantColor);
+        const dominantCauses = getCausesForColor(dominantColor);
+        const secondDominantCauses = getCausesForColor(secondDominantColor);
   
-          // 🎨 Color summary block
-          const colorBlock =
-          `There is also an energy imbalance in the following area:\n\n` +
-          ` ${dominantColor.toUpperCase()}\n` +  // Bold "Most Dominant Color"
-          `𝗥𝗲𝗹𝗮𝘁𝗲𝗱 𝗖𝗮𝘂𝘀𝗲𝘀: ${dominantCauses.join(', ') || 'N/A'}\n\n` +  // Bold "Related Causes"
-          ` ${secondDominantColor.toUpperCase()}\n` +  // Bold "Second Most Dominant Color"
-          `𝗥𝗲𝗹𝗮𝘁𝗲𝗱 𝗖𝗮𝘂𝘀𝗲𝘀: ${secondDominantCauses.join(', ') || 'N/A'}\n\n`;  // Bold "Related Causes"
-        
+        // 🧾 Determine energy imbalance level based on percentage range
+        let imbalanceLevel = '';
+        let percentageRange = '';
+        if (percentage >= 80) {
+          imbalanceLevel = 'VERY HIGH';
+          percentageRange = '80% - 100%';
+        } else if (percentage >= 50) {
+          imbalanceLevel = 'HIGH';
+          percentageRange = '50% - 79%';
+        } else if (percentage >= 30) {
+          imbalanceLevel = 'MODERATE';
+          percentageRange = '30% - 49%';
+        } else {
+          imbalanceLevel = 'LOW';
+          percentageRange = '0% - 29%';
+        }
   
-          // 🧾 Description entry
-          const newEntry =
-          `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:\n\n` +
-          `𝗖𝗔𝗨𝗦𝗘: ${name.toUpperCase()}\n` +  // Bold "CAUSE"
-          ` Description: ${description}\n=========================\n\n`;
-        
-        
-        
+        const levelKey = `${imbalanceLevel} (${percentageRange})`;
   
-          // 📦 Append to selected record
-          if (this.selectedExcelRecord) {
-            // 🧹 Remove previous color block if already present
-            const colorBlockStart = 'There is also an energy imbalance in the following area:';
-            this.selectedExcelRecord.fullDescription = this.selectedExcelRecord.fullDescription
-              .split(colorBlockStart)[0]
-              .trim();
+        // 📥 Store entry inside levelGroups instead of directly in fullDescription
+        const entry = 
+          `𝗖𝗔𝗨𝗦𝗘: ${name.toUpperCase()}\n` +
+          `𝗟𝗘𝗩𝗘𝗟: ${imbalanceLevel} (${percentageRange})\n` +
+          `Description: ${description}\n=========================\n\n`;
   
-            // ➕ Add new cause description
-            this.selectedExcelRecord.fullDescription += `\n\n${newEntry}`;
-          } else {
-            this.selectedExcelRecord = {
-              rahId,
-              name,
-              description,
-              fullDescription: newEntry
-            };
-          }
+        this.levelGroups[levelKey].push(entry);
   
-          // ✅ Add color block at the very end
-          this.selectedExcelRecord.fullDescription += `\n\n${colorBlock}`;
+        this.pendingRequests--;
   
-          this.cdRef.detectChanges();
-        
+        // 🏁 Check if all fetches are completed
+        if (this.pendingRequests === 0) {
+          this.assembleFullDescription(dominantColor, dominantCauses, secondDominantColor, secondDominantCauses);
+        }
+  
       },
       (error: any) => {
         console.error("❌ Error fetching record:", error);
+        this.pendingRequests--;
+  
+        // Still check if all pending requests are done even if error
+        if (this.pendingRequests === 0) {
+          this.assembleFullDescription('', [], '', []);
+        }
       }
     );
   }
+  
+  // 🛠️ Separate method to assemble the final fullDescription
+  assembleFullDescription(
+    dominantColor: string,
+    dominantCauses: string[],
+    secondDominantColor: string,
+    secondDominantCauses: string[]
+  ) {
+    // 🎨 Color summary block
+    const colorBlock =
+      `There is also an energy imbalance in the following area:\n\n` +
+      ` ${dominantColor.toUpperCase()}\n` +
+      `𝗥𝗲𝗹𝗮𝘁𝗲𝗱 𝗖𝗮𝘂𝘀𝗲𝘀: ${dominantCauses.join(', ') || 'N/A'}\n\n` +
+      ` ${secondDominantColor.toUpperCase()}\n` +
+      `𝗥𝗲𝗹𝗮𝘁𝗲𝗱 𝗖𝗮𝘂𝘀𝗲𝘀: ${secondDominantCauses.join(', ') || 'N/A'}\n\n`;
+  
+    // 🧾 Start assembling final description
+    let finalDescription = `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:\n\n`;
+  
+    const levelsOrder = [
+      "VERY HIGH (80% - 100%)",
+      "HIGH (50% - 79%)",
+      "MODERATE (30% - 49%)",
+      "LOW (0% - 29%)"
+    ];
+  
+    for (const level of levelsOrder) {
+      const entries = this.levelGroups[level];
+      if (entries.length > 0) {
+        finalDescription += `\n=== ${level} ===\n\n`;
+        entries.forEach(entry => {
+          finalDescription += entry;
+        });
+      }
+    }
+  
+    // ✅ Add color block at the very end
+    finalDescription += `\n\n${colorBlock}`;
+  
+    // 📦 Set selected record
+    if (this.selectedExcelRecord) {
+      this.selectedExcelRecord.fullDescription = finalDescription;
+    } else {
+      this.selectedExcelRecord = {
+        rahId: '',
+        name: '',
+        description: '',
+        fullDescription: finalDescription
+      };
+    }
+  
+    this.cdRef.detectChanges(); // Ensure UI updates
+  }
+
 
   fetchExcelRecordPopup(rahId: string, name: string) {
     this.excelService.searchRahId(rahId).subscribe(

@@ -58,126 +58,105 @@
     </ul>
   </div>
 
-  <div *ngIf="showRootCauses" class="color-counts" style="margin-top: 40px; text-align: center;">
-    <h5>Root Causes</h5>
-    <ul style="list-style: none; padding: 0; display: flex; justify-content: center;">
-      <li *ngFor="let color of objectKeys(colorCounts)" style="margin: 0 15px;">
-        <span [style.backgroundColor]="color"
-          style="width: 20px; height: 20px; display: inline-block; border-radius: 50%; margin-right: 10px;"></span>
-        {{ color | titlecase }}: {{ colorCounts[color] }} ({{ calculatePercentage(colorCounts[color]) }}%)
-      </li>
-    </ul>
-  </div>
-  
-
-
-  <div class="container mt-4 custom-container">
+  <div class="container mt-3 custom-container">
     <div class="row">
-      <div class="col-md-12">
+      <!-- LEFT SIDE (Root + Detailed Causes together) -->
+      <div class="col-md-7" style="max-height: 1200px; overflow-y: auto; padding-right: 15px;">
+        <!-- Root Causes -->
+        <div *ngIf="showRootCauses" class="color-counts" style="margin-top: 20px; text-align: center;">
+          <h5>Root Causes</h5>
+          <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; align-items: center;">
+            <li *ngFor="let color of objectKeys(colorCounts)" style="margin: 10px 0;">
+              <span [style.backgroundColor]="color"
+                style="width: 20px; height: 20px; display: inline-block; border-radius: 50%; margin-right: 10px;"></span>
+              {{ color | titlecase }}: {{ colorCounts[color] }} ({{ calculatePercentage(colorCounts[color]) }}%)
+            </li>
+          </ul>
+        </div>
+      
+        <!-- Detailed Causes -->
         <div *ngFor="let causeGroup of getSortedCauses(); let i = index; trackBy: trackByCause">
-          <mat-card class="cause-card">
+          <mat-card class="cause-card" style="margin-bottom: 10px; margin-top: 20px;">
             <mat-card-header (click)="toggleCauseDetails(i)" style="cursor: pointer;">
               <mat-card-title [style.color]="causeGroup.items[0]?.color">
                 {{ causeGroup.cause }}
-                <span style="float: right;">
-
-                </span>
               </mat-card-title>
             </mat-card-header>
-
+      
             <mat-card-content *ngIf="expandedCauseGroup[i]">
               <ul>
                 <li *ngFor="let item of causeGroup.items" [style.color]="item.color"
-                (click)="fetchExcelRecordPopup(item.code, item.name)">
+                    (click)="fetchExcelRecordPopup(item.code, item.name)">
                   <strong>{{ item.code }}</strong> - {{ item.name }} - {{ item.percentage }}%
                 </li>
               </ul>
             </mat-card-content>
-
-
           </mat-card>
+        </div>
+      </div>
+      
+  
+      <!-- RIGHT SIDE (Practitioner Comments only) -->
+      <div class="col-md-5">
+        <div *ngIf="selectedExcelRecord" class="edit-description-container p-4 rounded-xl shadow-md bg-white" style="margin-top: 20px;">
+          <h5 class="text-xl font-semibold text-gray-700 mb-2 border-b pb-1 underline">
+            Practitioner Comments
+          </h5>
+  
+          <mat-form-field appearance="fill" class="description-field" style="width: 100%;">
+            <mat-label style="font-size: 18px; text-decoration: underline; margin-bottom: 8px; display: inline-block;">
+              Description
+            </mat-label>
+            <textarea
+              matInput
+              [(ngModel)]="selectedExcelRecord.fullDescription"
+              class="auto-expand-textarea"
+              rows="10"
+              style="background-color: white;">
+            </textarea>
+          </mat-form-field>
+  
+          <mat-form-field appearance="fill" class="description-field" style="width: 100%;">
+            <mat-label>Recommendations</mat-label>
+            <textarea
+              matInput
+              class="auto-expand-textarea"
+              rows="10"
+              style="background-color: white;">
+              would recommend that the client takes the supplements as stated and also regular treatments so that the issues highlighted by the scan be addressed energetically:
+  
+  • Rayo Pure – This helps with removing harmful substances and parasites
+  Recommended intake
+  
+  • Rayobase – This helps with controlling the acid levels (pH levels)
+  Recommended intake
+  
+  • Rayovita – This helps support the vitamins trace element
+  Recommended intake
+  
+  • Rayoflora – This helps by providing 13 different live good bacteria strands
+  Recommended intake
+  
+  • Rayosole – This helps promote detoxification in the body
+  Recommended intake
+            </textarea>
+          </mat-form-field>
+  
+          <!-- Signature Image -->
+          <div style="margin-left: 0; text-align: left; margin-top: 20px;">
+            <p><strong>Signed by Lead Practitioner</strong></p>
+            <img src="assets/sign.jpg" alt="Signature" style="height: 30px; width: auto;">
+          </div>
+  
+          <div style="margin-top: 20px; text-align: center;">
+            <p style="font-size: 12px; color: #777; font-style: italic;">
+              This detailed report is based on cell energetics, and in no way replaces a full medical report.
+              The practitioner's comments are based on the findings of the imbalances caused by cell energetics
+              in the body through the Rayoscan process.
+            </p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-
-
-
-
-  <div *ngIf="selectedExcelRecord" class="edit-description-container p-4 rounded-xl shadow-md bg-white">
-    <h5 class="text-xl font-semibold text-gray-700 mb-2 border-b pb-1 underline">
-      Practitioner Comments
-    </h5>
-    
   
-
- 
-  
-
-    <mat-form-field appearance="fill" class="description-field">
-      <mat-label style="font-size: 18px; text-decoration: underline; margin-bottom: 8px; display: inline-block;">
-        Description
-      </mat-label>
-      
-
-      <textarea
-        matInput
-        [(ngModel)]="selectedExcelRecord.fullDescription"
-      
-        class="auto-expand-textarea"
-        rows="10"
-        style="background-color: white;">
-      </textarea>
-   
-    </mat-form-field>
-    <mat-form-field appearance="fill" class="description-field">
-      <mat-label>Recommendations</mat-label>
-      <textarea
-        matInput
-        class="auto-expand-textarea"
-        rows="10"
-        style="background-color: white;">
-    I would recommend that the client takes the following supplements:
-    
-    • Rayo Pure – This helps with removing harmful substances and parasites  
-    Recommended intake
-    
-    • Rayobase – This helps with controlling the acid levels (pH levels)  
-    Recommended intake
-    
-    • Rayovita – This helps support the vitamins trace element  
-    Recommended intake
-    
-    • Rayoflora – This helps by providing 13 different live good bacteria strands  
-    Recommended intake
-    
-    • Rayosole – This helps promote detoxification in the body  
-    Recommended intake
-      </textarea>
-    </mat-form-field>
-    
-    <!-- Signature Image -->
-<!-- Signature Image aligned to the left with reduced size -->
-<div style="margin-left: 0; text-align: left; margin-top: 20px;">
-  <p><strong>Signed by Lead Practitioner</strong></p>
-  <img src="assets/sign.jpg" alt="Signature" style="height: 30px; width: auto;">
-</div>
-<div style="margin-top: 20px; text-align: center;">
-  <p style="font-size: 12px; color: #777; font-style: italic;">
-    This detailed report is based on cell energetics, and in no way replaces a full medical report. The practitioner's comments are based on the findings of the imbalances caused by cell energetics in the body through the Rayoscan process.
-  </p>
-</div>
-
-
-
-
-   
-  </div>
-</div>
-
-
-
-
-
-
