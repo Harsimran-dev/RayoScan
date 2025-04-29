@@ -164,6 +164,37 @@ button:active {
   list-style-type: none;
   padding: 0;
 }
+.info-box {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  margin-top: 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  
+
+}
+.container1 {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+
+.info-box h5 {
+  margin-top: 0;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.info-row {
+  margin-bottom: 8px;
+}
+
+
+
 
 .cause-card li {
   padding: 8px;

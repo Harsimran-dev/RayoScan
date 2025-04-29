@@ -27,16 +27,28 @@
   <img src="assets/logo2.jpg" alt="Logo" style="height: 80px;">
 </div>
 
-  <h5>Client Information</h5>
-  <div *ngIf="rahIdNumber">
-    <p> DETAILED TEST  ID: {{ rahIdNumber }}</p>
-  </div>
-  <div *ngIf="rahHeaderSection">
-    <p>  {{ rahHeaderSection }}</p>
-  </div>
+<div class="container1">
+  <div class="info-box">
+    <h5>Client Information</h5>
 
-  <p><strong>Full Name:</strong> {{ clientData.fullName }}</p>
-  <p><strong>Date of birth:</strong> {{ clientData.dateOfBirth }}</p>
+    <div class="info-row" *ngIf="rahIdNumber">
+      <p><strong>DETAILED TEST ID:</strong> {{ rahIdNumber }}</p>
+    </div>
+
+    <div class="info-row" *ngIf="rahHeaderSection">
+      <p><strong>Test Description:</strong> {{ rahHeaderSection }}</p>
+    </div>
+
+    <div class="info-row">
+      <p><strong>Full Name:</strong> {{ clientData.fullName }}</p>
+    </div>
+
+    <div class="info-row">
+      <p><strong>Date of Birth:</strong> {{ clientData.dateOfBirth }}</p>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -123,7 +135,7 @@
               class="auto-expand-textarea"
               rows="10"
               style="background-color: white;">
-              would recommend that the client takes the supplements as stated and also regular treatments so that the issues highlighted by the scan be addressed energetically:
+ would recommend that the client takes the supplements as stated and also regular treatments so that the issues highlighted by the scan be addressed energetically:
   
   • Rayo Pure – This helps with removing harmful substances and parasites
   Recommended intake
