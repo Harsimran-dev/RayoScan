@@ -537,7 +537,6 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
     secondDominantColor: string,
     secondDominantCauses: string[]
   ) {
-    // 🎨 Color summary block
     const colorBlock =
       `There is also an energy imbalance in the following area:\n\n` +
       ` ${dominantColor.toUpperCase()}\n` +
@@ -545,7 +544,6 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       ` ${secondDominantColor.toUpperCase()}\n` +
       `𝗥𝗲𝗹𝗮𝘁𝗲𝗱 𝗖𝗮𝘂𝘀𝗲𝘀: ${secondDominantCauses.join(', ') || 'N/A'}\n\n`;
   
-    // 🧾 Start assembling final description
     let finalDescription = `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:\n\n`;
   
     const levelsOrder = [
@@ -560,15 +558,24 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       if (entries.length > 0) {
         finalDescription += `\n=== ${level} ===\n\n`;
         entries.forEach(entry => {
-          finalDescription += entry;
+          const lines = entry.split('\n');
+          const causeLine = lines.find(line => line.startsWith('𝗖𝗔𝗨𝗦𝗘:')) || '';
+          const levelLine = lines.find(line => line.startsWith('𝗟𝗘𝗩𝗘𝗟:')) || '';
+          const descLine = lines.find(line => line.startsWith(' Description:')) || '';
+  
+          if (level === "VERY HIGH (80% - 100%)") {
+            // Include name, level, and description
+            finalDescription += `${causeLine}\n${levelLine}\n${descLine}\n\n`;
+          } else {
+            // Include only name and level
+            finalDescription += `${causeLine}\n${levelLine}\n\n`;
+          }
         });
       }
     }
   
-    // ✅ Add color block at the very end
-    finalDescription += `\n\n${colorBlock}`;
+ 
   
-    // 📦 Set selected record
     if (this.selectedExcelRecord) {
       this.selectedExcelRecord.fullDescription = finalDescription;
     } else {
@@ -580,9 +587,10 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       };
     }
   
-    this.cdRef.detectChanges(); // Ensure UI updates
+    this.cdRef.detectChanges();
   }
-
+  
+  
 
   fetchExcelRecordPopup(rahId: string, name: string) {
     this.excelService.searchRahId(rahId).subscribe(
