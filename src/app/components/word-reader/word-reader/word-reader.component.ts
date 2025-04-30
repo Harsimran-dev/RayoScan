@@ -336,7 +336,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       });
   
       const rahId = this.rahIdNumber || 'RAHID';
-      const patientName = this.patientName || 'Patient';
+      const patientName = this.clientData?.fullName || 'Patient';
       const pdfTitle = `${patientName}_${rahId}_Rayoscan_Report`;
   
       printWindow.document.write(`
@@ -345,84 +345,131 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
             <title>${pdfTitle}</title>
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
             <style>
-              body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background-color: #f4f4f4;
-                margin: 0;
-                padding: 20px;
-              }
-  
-              .report-section {
-                background-color: white;
-                padding: 20px;
-                border-radius: 10px;
-                margin-bottom: 30px;
-                width: 100%;
-                max-width: 1000px;
-                margin: 0 auto;
-              }
-  
-              .info-box {
-                border: 1px solid #ccc;
-                border-radius: 10px;
-                padding: 16px;
-                background-color: #f9f9f9;
-                margin-bottom: 30px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-              }
-  
-              .root-causes,
-              .detailed-causes {
-                margin-top: 10px;
-                margin-bottom: 20px;
-              }
-  
-              .edit-description-container {
-                background-color: #fff;
-                border: 1px solid #ddd;
-                padding: 20px;
-                border-radius: 10px;
-                margin-top: 30px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-              }
-  
-              .cause-card {
-                border: 1px solid #eee;
-                padding: 10px;
-                margin-bottom: 10px;
-                border-radius: 5px;
-              }
-  
-              h5 {
-                color: #333;
-                margin-bottom: 12px;
-                font-weight: 600;
-              }
-  
-              .color-counts ul {
-                list-style: none;
-                padding-left: 0;
-              }
-  
-              .color-counts li {
-                display: flex;
-                align-items: center;
-                margin-bottom: 10px;
-              }
-  
-              .color-counts span {
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                display: inline-block;
-                margin-right: 10px;
-              }
-  
-              textarea {
-                white-space: pre-wrap;
-                font-family: inherit;
-                font-size: inherit;
-              }
+             body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin: 20px;
+  background-color: #f8f9fa;
+  color: #333;
+  font-size: 14px;
+}
+
+.report-section {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 5px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #222;
+}
+
+.color-counts ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.color-counts li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.color-counts span {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.cause-card {
+  border: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background-color: #fdfdfd;
+  box-shadow: inset 0 0 0 1px #e0e0e0;
+}
+
+.cause-card ul {
+  padding-left: 15px;
+  margin: 0;
+}
+
+.causes-box {
+  border: 1px solid #bbb;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 30px;
+  background-color: #fdfdfd;
+  box-shadow: none;
+}
+
+.edit-description-container {
+  background-color: #fff;
+  border: none;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.edit-description-container h5 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-decoration: underline;
+}
+
+.info-box {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  margin-top: 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.info-box h5 {
+  margin-top: 0;
+  color: #333;
+  text-align: center;
+  font-weight: bold;
+}
+
+.info-row {
+  margin-bottom: 8px;
+}
+
+.signature {
+  margin-top: 20px;
+}
+  /* Remove height limits for printing */
+.causes-wrapper {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+
+.note {
+  font-size: 12px;
+  color: #777;
+  font-style: italic;
+  text-align: center;
+  margin-top: 30px;
+}
             </style>
           </head>
           <body>
@@ -444,6 +491,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       }, 500);
     }
   }
+  
   
   
   

@@ -73,40 +73,48 @@
   <div class="container mt-3 custom-container">
     <div class="row">
       <!-- LEFT SIDE (Root + Detailed Causes together) -->
-      <div class="col-md-7" style="max-height: 1200px; overflow-y: auto; padding-right: 15px;">
-        <!-- Root Causes -->
-        <div *ngIf="showRootCauses" class="color-counts" style="margin-top: 20px; text-align: center;">
-          <h5>Root Causes</h5>
-          <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; align-items: center;">
-            <li *ngFor="let color of objectKeys(colorCounts)" style="margin: 10px 0;">
-              <span [style.backgroundColor]="color"
-                style="width: 20px; height: 20px; display: inline-block; border-radius: 50%; margin-right: 10px;"></span>
-              {{ color | titlecase }}: {{ colorCounts[color] }} ({{ calculatePercentage(colorCounts[color]) }}%)
-            </li>
-          </ul>
+      <div class="col-md-7 causes-wrapper" style="max-height: 1200px; overflow-y: auto; padding-right: 15px;">
+        
+        <!-- WRAPPER FOR BOTH -->
+        <div class="causes-box">
+          <h5 class="section-title">Root Causes</h5>
+  
+          <!-- Root Causes -->
+          <div *ngIf="showRootCauses" class="color-counts" style="margin-top: 20px; text-align: center;">
+            <h5>Root Causes</h5>
+            <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; align-items: center;">
+              <li *ngFor="let color of objectKeys(colorCounts)" style="margin: 10px 0;">
+                <span [style.backgroundColor]="color"
+                      style="width: 20px; height: 20px; display: inline-block; border-radius: 50%; margin-right: 10px;"></span>
+                {{ color | titlecase }}: {{ colorCounts[color] }} ({{ calculatePercentage(colorCounts[color]) }}%)
+              </li>
+            </ul>
+          </div>
+  
+          <!-- Detailed Causes -->
+          <div *ngFor="let causeGroup of getSortedCauses(); let i = index; trackBy: trackByCause">
+            <mat-card class="cause-card" style="margin-bottom: 10px; margin-top: 20px;">
+              <mat-card-header (click)="toggleCauseDetails(i)" style="cursor: pointer;">
+                <mat-card-title [style.color]="causeGroup.items[0]?.color">
+                  {{ causeGroup.cause }}
+                </mat-card-title>
+              </mat-card-header>
+  
+              <mat-card-content *ngIf="expandedCauseGroup[i]">
+                <ul>
+                  <li *ngFor="let item of causeGroup.items" [style.color]="item.color"
+                      (click)="fetchExcelRecordPopup(item.code, item.name)">
+                    <strong>{{ item.code }}</strong> - {{ item.name }} - {{ item.percentage }}%
+                  </li>
+                </ul>
+              </mat-card-content>
+            </mat-card>
+          </div>
         </div>
-      
-        <!-- Detailed Causes -->
-        <div *ngFor="let causeGroup of getSortedCauses(); let i = index; trackBy: trackByCause">
-          <mat-card class="cause-card" style="margin-bottom: 10px; margin-top: 20px;">
-            <mat-card-header (click)="toggleCauseDetails(i)" style="cursor: pointer;">
-              <mat-card-title [style.color]="causeGroup.items[0]?.color">
-                {{ causeGroup.cause }}
-              </mat-card-title>
-            </mat-card-header>
-      
-            <mat-card-content *ngIf="expandedCauseGroup[i]">
-              <ul>
-                <li *ngFor="let item of causeGroup.items" [style.color]="item.color"
-                    (click)="fetchExcelRecordPopup(item.code, item.name)">
-                  <strong>{{ item.code }}</strong> - {{ item.name }} - {{ item.percentage }}%
-                </li>
-              </ul>
-            </mat-card-content>
-          </mat-card>
-        </div>
+        <!-- END WRAPPER -->
+  
       </div>
-      
+  
   
       <!-- RIGHT SIDE (Practitioner Comments only) -->
       <div class="col-md-5">
