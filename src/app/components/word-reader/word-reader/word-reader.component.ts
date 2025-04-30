@@ -336,7 +336,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       });
   
       const rahId = this.rahIdNumber || 'RAHID';
-      const patientName = this.clientData?.fullName || 'Patient';
+      const patientName = this.patientName || 'Patient';
       const pdfTitle = `${patientName}_${rahId}_Rayoscan_Report`;
   
       printWindow.document.write(`
@@ -346,31 +346,57 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
             <style>
               body {
-                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-                  Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-                margin: 20px;
-                background-color: #f8f9fa;
-                color: #333;
-                font-size: 14px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 20px;
               }
   
               .report-section {
                 background-color: white;
                 padding: 20px;
                 border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
                 margin-bottom: 30px;
+                width: 100%;
+                max-width: 1000px;
+                margin: 0 auto;
               }
   
-              .section-title {
+              .info-box {
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                padding: 16px;
+                background-color: #f9f9f9;
+                margin-bottom: 30px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+              }
+  
+              .root-causes,
+              .detailed-causes {
+                margin-top: 10px;
+                margin-bottom: 20px;
+              }
+  
+              .edit-description-container {
+                background-color: #fff;
+                border: 1px solid #ddd;
+                padding: 20px;
+                border-radius: 10px;
+                margin-top: 30px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+              }
+  
+              .cause-card {
+                border: 1px solid #eee;
+                padding: 10px;
+                margin-bottom: 10px;
+                border-radius: 5px;
+              }
+  
+              h5 {
+                color: #333;
+                margin-bottom: 12px;
                 font-weight: 600;
-                font-size: 18px;
-                margin-bottom: 15px;
-                border-bottom: 2px solid #ccc;
-                padding-bottom: 5px;
-                text-align: center;
-                text-transform: uppercase;
-                color: #222;
               }
   
               .color-counts ul {
@@ -381,7 +407,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
               .color-counts li {
                 display: flex;
                 align-items: center;
-                margin-bottom: 8px;
+                margin-bottom: 10px;
               }
   
               .color-counts span {
@@ -392,65 +418,10 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
                 margin-right: 10px;
               }
   
-              .cause-card {
-                border: 1px solid #ddd;
-                padding: 10px;
-                margin-bottom: 10px;
-                border-radius: 8px;
-                background-color: #fdfdfd;
-              }
-  
-              .cause-card ul {
-                padding-left: 15px;
-              }
-  
-              .edit-description-container {
-                background-color: #fff;
-                border: 1px solid #ddd;
-                padding: 20px;
-                border-radius: 10px;
-              }
-  
-              .edit-description-container h5 {
-                font-size: 16px;
-                font-weight: 600;
-                margin-bottom: 12px;
-                text-decoration: underline;
-              }
-  
-              .info-box {
-                border: 1px solid #ccc;
-                border-radius: 10px;
-                padding: 16px;
-                background-color: #f9f9f9;
-                margin-top: 16px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                width: 100%;
-                max-width: 600px;
-                margin: 0 auto;
-              }
-  
-              .info-box h5 {
-                margin-top: 0;
-                color: #333;
-                text-align: center;
-                font-weight: bold;
-              }
-  
-              .info-row {
-                margin-bottom: 8px;
-              }
-  
-              .signature {
-                margin-top: 20px;
-              }
-  
-              .note {
-                font-size: 12px;
-                color: #777;
-                font-style: italic;
-                text-align: center;
-                margin-top: 30px;
+              textarea {
+                white-space: pre-wrap;
+                font-family: inherit;
+                font-size: inherit;
               }
             </style>
           </head>
@@ -473,6 +444,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       }, 500);
     }
   }
+  
   
   
   
@@ -660,10 +632,12 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       const entries = this.levelGroups[level];
       if (entries && entries.length > 0) {
         if (level === "90% - 100%" && !veryHighIntroAdded) {
-          finalDescription += `The detailed scan shows 𝘃𝗲𝗿𝘆 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:`;
+          finalDescription += `The detailed scan shows 𝘃𝗲𝗿𝘆 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:\n`;
           veryHighIntroAdded = true;
         } else if (level === "75% - 89%" && !highIntroAdded) {
-          finalDescription += `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:`;
+          // Add a line separator before high-level section
+          finalDescription += `\n----------------------------------------\n\n`;
+          finalDescription += `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:\n`;
           highIntroAdded = true;
         }
         finalDescription += ` ${level}\n\n`;
@@ -695,6 +669,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
   
     this.cdRef.detectChanges();
   }
+  
   
   
 
