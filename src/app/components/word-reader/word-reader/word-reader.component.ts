@@ -320,7 +320,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
   }
   printPage() {
     const printContent = document.getElementById('printSection');
-    const printWindow = window.open('', '', 'height=600,width=800');
+    const printWindow = window.open('', '', 'height=800,width=1000');
   
     if (printContent && printWindow) {
       const textareas = printContent.querySelectorAll('textarea');
@@ -331,25 +331,39 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
         div.textContent = textarea.value;
         div.style.cssText = window.getComputedStyle(textarea).cssText;
         div.style.whiteSpace = 'pre-wrap';
-  
         textarea.parentNode?.replaceChild(div, textarea);
         replacements.push({ original: textarea, replacement: div });
       });
   
-      // Use rahIdNumber as title if available
       const rahId = this.rahIdNumber || 'RAHID';
       const patientName = this.patientName || 'Patient';
       const pdfTitle = `${patientName}_${rahId}_Rayoscan_Report`;
   
-      printWindow.document.write(`<html><head><title>${pdfTitle}</title><style>`);
-      printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
-      printWindow.document.write('h5 { color: #333; }');
-      printWindow.document.write('</style></head><body>');
-      printWindow.document.write(printContent.innerHTML);
-      printWindow.document.write('</body></html>');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${pdfTitle}</title>
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              h5 { color: #333; }
+              .cause-card { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+              .edit-description-container { border: 1px solid #ddd; padding: 15px; border-radius: 8px; background-color: #fff; }
+              .container { width: 100%; max-width: 1000px; margin: 0 auto; }
+              .color-counts ul { list-style: none; padding-left: 0; }
+              .color-counts li { display: flex; align-items: center; margin-bottom: 10px; }
+              .color-counts span { width: 20px; height: 20px; border-radius: 50%; display: inline-block; margin-right: 10px; }
+              textarea { white-space: pre-wrap; font-family: inherit; font-size: inherit; }
+            </style>
+          </head>
+          <body>
+            ${printContent.innerHTML}
+          </body>
+        </html>
+      `);
+  
       printWindow.document.close();
   
-      // Restore original textareas
       replacements.forEach(({ original, replacement }) => {
         replacement.parentNode?.replaceChild(original, replacement);
       });
@@ -359,6 +373,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       }, 500);
     }
   }
+  
   
   
   
@@ -561,7 +576,8 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
           const lines = entry.split('\n');
           const causeLine = lines.find(line => line.startsWith('𝗖𝗔𝗨𝗦𝗘:')) || '';
           const levelLine = lines.find(line => line.startsWith('𝗟𝗘𝗩𝗘𝗟:')) || '';
-          const descLine = lines.find(line => line.startsWith(' Description:')) || '';
+          const descLine = lines.find(line => line.trim().startsWith('Description:')) || '';
+
   
           if (level === "VERY HIGH (80% - 100%)") {
             // Include name, level, and description
