@@ -336,7 +336,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       });
   
       const rahId = this.rahIdNumber || 'RAHID';
-      const patientName = this.patientName || 'Patient';
+      const patientName = this.clientData?.fullName || 'Patient';
       const pdfTitle = `${patientName}_${rahId}_Rayoscan_Report`;
   
       printWindow.document.write(`
@@ -345,19 +345,119 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
             <title>${pdfTitle}</title>
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
             <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
-              h5 { color: #333; }
-              .cause-card { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
-              .edit-description-container { border: 1px solid #ddd; padding: 15px; border-radius: 8px; background-color: #fff; }
-              .container { width: 100%; max-width: 1000px; margin: 0 auto; }
-              .color-counts ul { list-style: none; padding-left: 0; }
-              .color-counts li { display: flex; align-items: center; margin-bottom: 10px; }
-              .color-counts span { width: 20px; height: 20px; border-radius: 50%; display: inline-block; margin-right: 10px; }
-              textarea { white-space: pre-wrap; font-family: inherit; font-size: inherit; }
+              body {
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+                  Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                margin: 20px;
+                background-color: #f8f9fa;
+                color: #333;
+                font-size: 14px;
+              }
+  
+              .report-section {
+                background-color: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                margin-bottom: 30px;
+              }
+  
+              .section-title {
+                font-weight: 600;
+                font-size: 18px;
+                margin-bottom: 15px;
+                border-bottom: 2px solid #ccc;
+                padding-bottom: 5px;
+                text-align: center;
+                text-transform: uppercase;
+                color: #222;
+              }
+  
+              .color-counts ul {
+                list-style: none;
+                padding-left: 0;
+              }
+  
+              .color-counts li {
+                display: flex;
+                align-items: center;
+                margin-bottom: 8px;
+              }
+  
+              .color-counts span {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                display: inline-block;
+                margin-right: 10px;
+              }
+  
+              .cause-card {
+                border: 1px solid #ddd;
+                padding: 10px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                background-color: #fdfdfd;
+              }
+  
+              .cause-card ul {
+                padding-left: 15px;
+              }
+  
+              .edit-description-container {
+                background-color: #fff;
+                border: 1px solid #ddd;
+                padding: 20px;
+                border-radius: 10px;
+              }
+  
+              .edit-description-container h5 {
+                font-size: 16px;
+                font-weight: 600;
+                margin-bottom: 12px;
+                text-decoration: underline;
+              }
+  
+              .info-box {
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                padding: 16px;
+                background-color: #f9f9f9;
+                margin-top: 16px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+              }
+  
+              .info-box h5 {
+                margin-top: 0;
+                color: #333;
+                text-align: center;
+                font-weight: bold;
+              }
+  
+              .info-row {
+                margin-bottom: 8px;
+              }
+  
+              .signature {
+                margin-top: 20px;
+              }
+  
+              .note {
+                font-size: 12px;
+                color: #777;
+                font-style: italic;
+                text-align: center;
+                margin-top: 30px;
+              }
             </style>
           </head>
           <body>
-            ${printContent.innerHTML}
+            <div class="report-section">
+              ${printContent.innerHTML}
+            </div>
           </body>
         </html>
       `);
@@ -373,6 +473,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       }, 500);
     }
   }
+  
   
   
   
@@ -480,7 +581,6 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       (description: string | null) => {
         console.log("🚀 Fetched Description:", description);
   
-        // 🧠 Sort colors by count in descending order
         const sortedColors = Object.entries(this.colorCounts)
           .sort((a, b) => b[1] - a[1])
           .map(entry => entry[0]);
@@ -488,7 +588,6 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
         const dominantColor = sortedColors[0] || '';
         const secondDominantColor = sortedColors[1] || '';
   
-        // 📌 Helper function to get causes for a color
         const getCausesForColor = (color: string): string[] => {
           return Object.entries(this.causeCodes)
             .filter(([cause, items]) => items.some(item => item.color === color))
@@ -498,27 +597,26 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
         const dominantCauses = getCausesForColor(dominantColor);
         const secondDominantCauses = getCausesForColor(secondDominantColor);
   
-        // 🧾 Determine energy imbalance level based on percentage range
         let imbalanceLevel = '';
         let percentageRange = '';
-        if (percentage >= 80) {
+        if (percentage >= 90) {
           imbalanceLevel = 'VERY HIGH';
-          percentageRange = '80% - 100%';
-        } else if (percentage >= 50) {
+          percentageRange = '90% - 100%';
+        } else if (percentage >= 75) {
           imbalanceLevel = 'HIGH';
-          percentageRange = '50% - 79%';
-        } else if (percentage >= 30) {
-          imbalanceLevel = 'MODERATE';
-          percentageRange = '30% - 49%';
+          percentageRange = '75% - 89%';
         } else {
-          imbalanceLevel = 'LOW';
-          percentageRange = '0% - 29%';
+          this.pendingRequests--;
+          return; // Skip if outside required range
         }
   
-        const levelKey = `${imbalanceLevel} (${percentageRange})`;
+        const levelKey = percentageRange;
   
-        // 📥 Store entry inside levelGroups instead of directly in fullDescription
-        const entry = 
+        if (!this.levelGroups[levelKey]) {
+          this.levelGroups[levelKey] = [];
+        }
+  
+        const entry =
           `𝗖𝗔𝗨𝗦𝗘: ${name.toUpperCase()}\n` +
           `𝗟𝗘𝗩𝗘𝗟: ${imbalanceLevel} (${percentageRange})\n` +
           `Description: ${description}\n=========================\n\n`;
@@ -527,17 +625,14 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
   
         this.pendingRequests--;
   
-        // 🏁 Check if all fetches are completed
         if (this.pendingRequests === 0) {
           this.assembleFullDescription(dominantColor, dominantCauses, secondDominantColor, secondDominantCauses);
         }
-  
       },
       (error: any) => {
         console.error("❌ Error fetching record:", error);
         this.pendingRequests--;
   
-        // Still check if all pending requests are done even if error
         if (this.pendingRequests === 0) {
           this.assembleFullDescription('', [], '', []);
         }
@@ -545,52 +640,47 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
     );
   }
   
-  // 🛠️ Separate method to assemble the final fullDescription
+  
   assembleFullDescription(
     dominantColor: string,
     dominantCauses: string[],
     secondDominantColor: string,
     secondDominantCauses: string[]
   ) {
-    const colorBlock =
-      `There is also an energy imbalance in the following area:\n\n` +
-      ` ${dominantColor.toUpperCase()}\n` +
-      `𝗥𝗲𝗹𝗮𝘁𝗲𝗱 𝗖𝗮𝘂𝘀𝗲𝘀: ${dominantCauses.join(', ') || 'N/A'}\n\n` +
-      ` ${secondDominantColor.toUpperCase()}\n` +
-      `𝗥𝗲𝗹𝗮𝘁𝗲𝗱 𝗖𝗮𝘂𝘀𝗲𝘀: ${secondDominantCauses.join(', ') || 'N/A'}\n\n`;
-  
-    let finalDescription = `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:\n\n`;
+    let finalDescription = '';
+    let veryHighIntroAdded = false;
+    let highIntroAdded = false;
   
     const levelsOrder = [
-      "VERY HIGH (80% - 100%)",
-      "HIGH (50% - 79%)",
-      "MODERATE (30% - 49%)",
-      "LOW (0% - 29%)"
+      "90% - 100%",
+      "75% - 89%"
     ];
   
     for (const level of levelsOrder) {
       const entries = this.levelGroups[level];
-      if (entries.length > 0) {
-        finalDescription += `\n=== ${level} ===\n\n`;
+      if (entries && entries.length > 0) {
+        if (level === "90% - 100%" && !veryHighIntroAdded) {
+          finalDescription += `The detailed scan shows 𝘃𝗲𝗿𝘆 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:`;
+          veryHighIntroAdded = true;
+        } else if (level === "75% - 89%" && !highIntroAdded) {
+          finalDescription += `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:`;
+          highIntroAdded = true;
+        }
+        finalDescription += ` ${level}\n\n`;
+  
         entries.forEach(entry => {
           const lines = entry.split('\n');
           const causeLine = lines.find(line => line.startsWith('𝗖𝗔𝗨𝗦𝗘:')) || '';
-          const levelLine = lines.find(line => line.startsWith('𝗟𝗘𝗩𝗘𝗟:')) || '';
           const descLine = lines.find(line => line.trim().startsWith('Description:')) || '';
-
   
-          if (level === "VERY HIGH (80% - 100%)") {
-            // Include name, level, and description
-            finalDescription += `${causeLine}\n${levelLine}\n${descLine}\n\n`;
+          if (level === "90% - 100%") {
+            finalDescription += `${causeLine}\n\n${descLine}\n`;
           } else {
-            // Include only name and level
-            finalDescription += `${causeLine}\n${levelLine}\n\n`;
+            finalDescription += `${causeLine}\n`;
           }
         });
       }
     }
-  
- 
   
     if (this.selectedExcelRecord) {
       this.selectedExcelRecord.fullDescription = finalDescription;
