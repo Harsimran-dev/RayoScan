@@ -242,7 +242,7 @@ ngOnInit(): void {
   processExtractedText(text: string) {
     const regex = /(\d{2}\.\d{2})\s+([^\d%][^%]+?)\s+(\d{1,3})%/g;
   
-    const highPercentageRahIds: { rahId: string, name: string ,percentage: number}[] = [];
+    const highPercentageRahIds: { rahId: string, name: string, percentage: number, cause: string }[] = [];
     const categoryCounts: { [key: string]: number } = {};
     const categoryCodes: { [key: string]: { code: string, name: string, percentage: number, color: string }[] } = {};
   
@@ -289,7 +289,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       categoryCounts[cause] += 1;
       categoryCodes[cause].push({ code, name, percentage, color });
   
-      highPercentageRahIds.push({ rahId: code, name, percentage });
+      highPercentageRahIds.push({ rahId: code, name, percentage, cause });
 
     }
   
@@ -299,7 +299,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
     this.countColors();
   
     // Fetch details for 100% entries
-    highPercentageRahIds.forEach(record => this.fetchExcelRecord(record.rahId, record.name, record.percentage));
+    highPercentageRahIds.forEach(record => this.fetchExcelRecord(record.rahId, record.name, record.percentage,record.cause));
   
     // Update Pie Chart
     this.pieChartData.labels = Object.keys(this.causeCounts);
@@ -594,7 +594,7 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
     this.showPdfPreview = !this.showPdfPreview;
   }
 
-  fetchExcelRecord(rahId: string, name: string, percentage: number) {
+  fetchExcelRecord(rahId: string, name: string, percentage: number, cause: string) {
     this.pendingRequests++;
   
     this.excelService.searchRahId(rahId).subscribe(
@@ -637,7 +637,8 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
         }
   
         const entry =
-          `𝗖𝗔𝗨𝗦𝗘: ${name.toUpperCase()}\n` +
+          `𝗖𝗔𝗨𝗦𝗘: ${cause.toUpperCase()}\n` + // Display cause
+          `𝗡𝗔𝗠𝗘: ${name.toUpperCase()}\n` +   // Display name
           `𝗟𝗘𝗩𝗘𝗟: ${imbalanceLevel} (${percentageRange})\n` +
           `Description: ${description}\n=========================\n\n`;
   
@@ -680,25 +681,25 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       const entries = this.levelGroups[level];
       if (entries && entries.length > 0) {
         if (level === "90% - 100%" && !veryHighIntroAdded) {
-          finalDescription += `The detailed scan shows 𝘃𝗲𝗿𝘆 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:\n`;
+          finalDescription += `The detailed scan shows 𝘃𝗲𝗿𝘆 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 90%-100% in:\n`;
           veryHighIntroAdded = true;
         } else if (level === "75% - 89%" && !highIntroAdded) {
-          // Add a line separator before high-level section
           finalDescription += `\n----------------------------------------\n\n`;
-          finalDescription += `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 in:\n`;
+          finalDescription += `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 89% -75% in:\n`;
           highIntroAdded = true;
         }
-        finalDescription += ` ${level}\n\n`;
   
         entries.forEach(entry => {
           const lines = entry.split('\n');
           const causeLine = lines.find(line => line.startsWith('𝗖𝗔𝗨𝗦𝗘:')) || '';
+          const nameLine = lines.find(line => line.startsWith('𝗡𝗔𝗠𝗘:')) || '';
           const descLine = lines.find(line => line.trim().startsWith('Description:')) || '';
   
+          // Update the final description format: cause in brackets next to name
           if (level === "90% - 100%") {
-            finalDescription += `${causeLine}\n\n${descLine}\n`;
+            finalDescription += `${nameLine} (${causeLine.replace('𝗖𝗔𝗨𝗦𝗘:', '').trim()})\n\n${descLine}\n`;
           } else {
-            finalDescription += `${causeLine}\n`;
+            finalDescription += `${nameLine} (${causeLine.replace('𝗖𝗔𝗨𝗦𝗘:', '').trim()})\n`; // Cause in brackets
           }
         });
       }
