@@ -672,16 +672,13 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
     let veryHighIntroAdded = false;
     let highIntroAdded = false;
   
-    const levelsOrder = [
-      "90% - 100%",
-      "75% - 89%"
-    ];
+    const levelsOrder = ["90% - 100%", "75% - 89%"];
   
     for (const level of levelsOrder) {
       const entries = this.levelGroups[level];
       if (entries && entries.length > 0) {
         if (level === "90% - 100%" && !veryHighIntroAdded) {
-          finalDescription += `The detailed scan shows 𝘃𝗲𝗿𝘆 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 90%-100% in:\n`;
+          finalDescription += `The detailed scan shows 𝗩𝗘𝗥𝗬 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 90%-100% in:\n`;
           veryHighIntroAdded = true;
         } else if (level === "75% - 89%" && !highIntroAdded) {
           finalDescription += `\n----------------------------------------\n\n`;
@@ -695,11 +692,16 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
           const nameLine = lines.find(line => line.startsWith('𝗡𝗔𝗠𝗘:')) || '';
           const descLine = lines.find(line => line.trim().startsWith('Description:')) || '';
   
-          // Update the final description format: cause in brackets next to name
+          const name = nameLine.replace('𝗡𝗔𝗠𝗘:', '').trim();
+          const cause = causeLine.replace('𝗖𝗔𝗨𝗦𝗘:', '').trim();
+  
+          const formattedName = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+          const formattedCause = cause.toLowerCase();
+  
           if (level === "90% - 100%") {
-            finalDescription += `${nameLine} (${causeLine.replace('𝗖𝗔𝗨𝗦𝗘:', '').trim()})\n\n${descLine}\n`;
+            finalDescription += `${formattedName} (${formattedCause})\n\n${descLine}\n`;
           } else {
-            finalDescription += `${nameLine} (${causeLine.replace('𝗖𝗔𝗨𝗦𝗘:', '').trim()})\n`; // Cause in brackets
+            finalDescription += `${formattedName} (${formattedCause})\n`;
           }
         });
       }
