@@ -660,6 +660,28 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       }
     );
   }
+  toUnicodeBold(text: string): string {
+    const offsetMap: { [key: string]: number } = {
+      'lower': 0x1D41A - 'a'.charCodeAt(0), // a-z
+      'upper': 0x1D400 - 'A'.charCodeAt(0), // A-Z
+      'digit': 0x1D7CE - '0'.charCodeAt(0)  // 0-9
+    };
+  
+    return text.split('').map(char => {
+      const code = char.charCodeAt(0);
+      if (char >= 'a' && char <= 'z') {
+        return String.fromCodePoint(code + offsetMap['lower']);
+      } else if (char >= 'A' && char <= 'Z') {
+        return String.fromCodePoint(code + offsetMap['upper']);
+      } else if (char >= '0' && char <= '9') {
+        return String.fromCodePoint(code + offsetMap['digit']);
+      } else {
+        return char; // keep punctuation and spaces as is
+      }
+    }).join('');
+  }
+  
+  
   
   
   assembleFullDescription(
@@ -699,10 +721,15 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
           const formattedCause = cause.toLowerCase();
   
           if (level === "90% - 100%") {
-            finalDescription += `${formattedName} (${formattedCause})\n\n${descLine}\n`;
+            const rawName = nameLine.replace('𝗡𝗔𝗠𝗘:', '').trim();
+            const boldName = this.toUnicodeBold(rawName);
+            finalDescription += `${boldName} (${causeLine.replace('𝗖𝗔𝗨𝗦𝗘:', '').trim().toLowerCase()})\n\n${descLine}\n`;
+            finalDescription += `\n----------------------------------------\n\n`;
+
           } else {
             finalDescription += `${formattedName} (${formattedCause})\n`;
           }
+       
         });
       }
     }
