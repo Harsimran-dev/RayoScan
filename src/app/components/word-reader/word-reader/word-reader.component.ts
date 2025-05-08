@@ -700,11 +700,11 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       const entries = this.levelGroups[level];
       if (entries && entries.length > 0) {
         if (level === "90% - 100%" && !veryHighIntroAdded) {
-          finalDescription += `The detailed scan shows 𝗩𝗘𝗥𝗬 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 90%-100% in:\n`;
+          finalDescription += `The detailed scan shows 𝗩𝗘𝗥𝗬 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 90%-100% in:\n\n\n`;
           veryHighIntroAdded = true;
         } else if (level === "75% - 89%" && !highIntroAdded) {
           finalDescription += `\n----------------------------------------\n\n`;
-          finalDescription += `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 89% -75% in:\n`;
+          finalDescription += `The detailed scan shows 𝗵𝗶𝗴𝗵 𝗲𝗻𝗲𝗿𝗴𝗲𝘁𝗶𝗰 𝗶𝗺𝗯𝗮𝗹𝗮𝗻𝗰𝗲𝘀 89% -75% in:\n\n\n`;
           highIntroAdded = true;
         }
   
