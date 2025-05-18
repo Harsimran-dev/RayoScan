@@ -9,6 +9,7 @@ import html2canvas from 'html2canvas';
 import { ExcelServiceService } from '../../excel-service.service';
 import { NgxSignaturePadComponent, SignaturePadOptions } from '@o.krucheniuk/ngx-signature-pad';
 import { forkJoin } from 'rxjs';
+import { GeminiService } from '../../gemini.service';
 
 
 @Component({
@@ -37,7 +38,7 @@ export class WordReaderComponent implements AfterViewInit {
   expandedCauseGroup: boolean[] = [];
   showRootCauses = true; // default to visible
   rahHeaderSection: string = ""; 
-
+  aminoAcidInsights: { name: string, response: string }[] = [];
 
   extractedCodes: string[] = [];
   causeCounts: { [key: string]: number } = {};
@@ -72,7 +73,7 @@ export class WordReaderComponent implements AfterViewInit {
     },
   };
 
-  constructor(private excelService: ExcelServiceService,public dialog: MatDialog,  private cdRef: ChangeDetectorRef,private sanitizer: DomSanitizer,private cdr: ChangeDetectorRef) {}
+  constructor(private geminiService:GeminiService,private excelService: ExcelServiceService,public dialog: MatDialog,  private cdRef: ChangeDetectorRef,private sanitizer: DomSanitizer,private cdr: ChangeDetectorRef) {}
 
   async readFile(event: any) {
     const file = event.target.files[0];
@@ -123,6 +124,8 @@ ngOnInit(): void {
   const causeCount = this.getSortedCauses().length;
   console.log(this.expandedCauseGroup)
   this.expandedCauseGroup = new Array(causeCount).fill(true);
+
+
 }
 
   
@@ -248,27 +251,23 @@ ngOnInit(): void {
   
     let match;
   
-    // ✅ Improved Smart Clean: Skip 'RAH 46.00...' header and start from first line with: XX.XX SomeName 100%
-   // Match the actual start of useful data
-// Match the actual start of useful data
-const actualStartMatch = text.match(/(\d{2}\.\d{2})\s+[^\d%]+\s+(\d{1,3})%/);
-
-if (actualStartMatch && actualStartMatch.index !== undefined) {
-  const headerPortion = text.substring(0, actualStartMatch.index);
-
-  // Match only the line that starts with "RAH" and ends before "No." or a newline
-  const rahLineMatch = headerPortion.match(/RAH\s+\d{2}\.\d{2}\s+(.+?)\s+(No\.|Program name|$)/);
-  if (rahLineMatch) {
-    const rahCleaned = ` ${rahLineMatch[0].split("No.")[0].trim()}`;
-    this.rahHeaderSection = rahCleaned;
-    console.log( this.rahHeaderSection)
-  }
-
-  text = text.substring(actualStartMatch.index);
-}
-
-
-
+    // ✅ Smart clean: Start from first real data line
+    const actualStartMatch = text.match(/(\d{2}\.\d{2})\s+[^\d%]+\s+(\d{1,3})%/);
+  
+    if (actualStartMatch && actualStartMatch.index !== undefined) {
+      const headerPortion = text.substring(0, actualStartMatch.index);
+  
+      // Match RAH header
+      const rahLineMatch = headerPortion.match(/RAH\s+\d{2}\.\d{2}\s+(.+?)\s+(No\.|Program name|$)/);
+      if (rahLineMatch) {
+        const rahCleaned = ` ${rahLineMatch[0].split("No.")[0].trim()}`;
+        this.rahHeaderSection = rahCleaned;
+        console.log(this.rahHeaderSection);
+      }
+  
+      // Trim text to exclude header
+      text = text.substring(actualStartMatch.index);
+    }
   
     while ((match = regex.exec(text)) !== null) {
       const code = match[1]?.trim();
@@ -290,18 +289,31 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
       categoryCodes[cause].push({ code, name, percentage, color });
   
       highPercentageRahIds.push({ rahId: code, name, percentage, cause });
-
     }
   
-    // Assign to component properties
+    // ✅ Assign to component properties
     this.causeCounts = categoryCounts;
     this.causeCodes = categoryCodes;
     this.countColors();
   
-    // Fetch details for 100% entries
-    highPercentageRahIds.forEach(record => this.fetchExcelRecord(record.rahId, record.name, record.percentage,record.cause));
+    // ✅ Log all names under 'Amino acids'
+    if (categoryCodes["Amino acids"]) {
+      const aminoAcidNames = categoryCodes["Amino acids"].map(item => item.name);
+      console.log("🧪 Names under 'Amino acids':", aminoAcidNames);
+    
+      // 🔁 Send each name to Gemini service
+      aminoAcidNames.forEach(name => {
+        this.processAminoAcidNameWithGemini(name);
+      });
+    }
+    
   
-    // Update Pie Chart
+    // ✅ Fetch details for 100% entries
+    highPercentageRahIds.forEach(record =>
+      this.fetchExcelRecord(record.rahId, record.name, record.percentage, record.cause)
+    );
+  
+    // ✅ Update Pie Chart
     this.pieChartData.labels = Object.keys(this.causeCounts);
     this.pieChartData.datasets[0].data = Object.values(this.causeCounts);
     this.legendColors = this.chartColors.slice(0, this.pieChartData.labels.length);
@@ -310,6 +322,56 @@ if (actualStartMatch && actualStartMatch.index !== undefined) {
     this.showPieChart = true;
     this.updatePieChart();
   }
+  
+  processAminoAcidNameWithGemini(name: string): void {
+    const prompt = `Provide information on how to naturally boost the amino acid ${name}. Limit the explanation to 60 words. Include food types that are alkaline and not acidic.`;
+  
+    this.geminiService.getGeneratedContent(prompt).subscribe({
+      next: (response: any) => {
+        console.log(`📩 Gemini raw response for ${name}:`, response);
+  
+        // Safely extract the text
+        const text = response?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+  
+        this.aminoAcidInsights.push({ name, response: text });
+        this.updateRecommendationText();
+      },
+      error: (err) => {
+        console.error(`❌ Error from Gemini for ${name}:`, err);
+        this.aminoAcidInsights.push({ name, response: 'Failed to load data from Gemini.' });
+      }
+    });
+  }
+
+  public recommendationText: string = '';
+
+updateRecommendationText(): void {
+  let insightsText = this.aminoAcidInsights.map(insight =>
+    `Amino Acid: ${insight.name}\n${insight.response}\n`
+  ).join('\n');
+
+  const staticRecommendations = `
+I would recommend that the client takes the supplements as stated and also regular treatments so that the issues highlighted by the scan be addressed energetically:
+
+• 𝗥𝗔𝗬𝗢𝗣𝗨𝗥𝗘 – This helps with removing harmful substances and parasites  
+Recommended intake: 1 capsule per day for 2 weeks, can be taken first thing in morning, 30 min before breakfast. Recommended to drink plenty of water during the day
+
+• 𝗥𝗔𝗬𝗢𝗕𝗔𝗦𝗘 – This helps with controlling the acid levels (pH levels)  
+Recommended intake: 1 capsule per day for 2 weeks, can be taken before breakfast
+
+• 𝗥𝗔𝗬𝗢𝗩𝗜𝗧𝗔 – This helps support the vitamins trace element  
+Recommended intake: 1 Sachet per day for 1 week, can be taken before lunch mixed in any drink
+
+• 𝗥𝗔𝗬𝗢𝗙𝗟𝗢𝗥𝗔 – This helps by providing 13 different live good bacteria strands  
+Recommended intake: 1 Sachet per day for 1 week, needs to be mixed in lukewarm water 30 mins before bed time
+
+• 𝗥𝗔𝗬𝗢𝗦𝗢𝗟𝗘 – This helps promote detoxification in the body  
+Recommended: 1 Tablespoon per foot spa, ideally 2 foot spas per week
+`;
+
+  this.recommendationText = insightsText + '\n' + staticRecommendations;
+}
+
   
   
   

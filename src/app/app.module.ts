@@ -11,6 +11,7 @@ import { MatDialogModule } from '@angular/material/dialog'; // Import MatDialogM
 import { MatFormFieldModule } from '@angular/material/form-field'; // Import MatFormFieldModule
 import { MatInputModule } from '@angular/material/input'; // Import MatInputModule
 import { NgxSignaturePadModule } from "@o.krucheniuk/ngx-signature-pad";
+import { HttpClientModule } from '@angular/common/http';
 
 
 // Chart Module
@@ -40,6 +41,7 @@ import { MatExpansionModule } from '@angular/material/expansion';  // For accord
     BrowserAnimationsModule, // Required for Angular Material
     AppRoutingModule,
     MatButtonModule,
+    HttpClientModule,
     MatCardModule,
     MatIconModule,
     MatExpansionModule,
