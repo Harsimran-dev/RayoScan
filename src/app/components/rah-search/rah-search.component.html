@@ -1,0 +1,48 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex flex-col items-center p-8">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">🔍 RAH ID Search</h1>
+  
+    <input
+      [formControl]="rahIdControl"
+      type="text"
+      placeholder="Enter RAH ID"
+      class="w-full max-w-md px-4 py-2 border rounded-xl shadow focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4"
+    />
+  
+    <div *ngIf="loading" class="text-gray-600 mt-2 loader">Searching...</div>
+  
+    <div *ngIf="result" class="result-card w-full max-w-xl">
+      <div class="space-y-6 flex flex-col items-start">
+  
+        <div class="w-[100px] overflow-hidden">
+          <h2 class="text-xl font-semibold text-indigo-600 mb-1">📘 Description</h2>
+          <p class="text-gray-700 text-justify leading-relaxed break-words">
+            {{ result.description || 'Not available' }}
+          </p>
+        </div>
+  
+        <div class="w-[100px] overflow-hidden">
+          <h2 class="text-xl font-semibold text-indigo-600 mb-1">📝 Recommendation</h2>
+          <p class="text-gray-700 text-justify leading-relaxed break-words">
+            {{ result.recommendation || 'Not available' }}
+          </p>
+        </div>
+  
+        <div *ngIf="result.image" class="w-[300px]">
+          <h2 class="text-xl font-semibold text-indigo-600 mb-1">🖼️ Image</h2>
+          <div class="image-wrapper">
+            <img
+              [src]="result.image"
+              alt="RAH Image"
+              class="rah-image"
+            />
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  
+    <div *ngIf="!result && !loading && rahIdControl.value" class="text-red-500 mt-4 no-result">
+      No matching RAH ID found.
+    </div>
+  </div>
+  

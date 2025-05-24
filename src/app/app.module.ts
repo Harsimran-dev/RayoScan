@@ -17,6 +17,7 @@ import { HttpClientModule } from '@angular/common/http';
 // Chart Module
 import { NgChartsModule } from 'ng2-charts';
 import { FormsModule } from '@angular/forms'; 
+import { ReactiveFormsModule } from '@angular/forms'; // ✅ Import this
 
 // Components
 import { WordReaderComponent } from './components/word-reader/word-reader/word-reader.component';
@@ -25,7 +26,8 @@ import { RayoScanComponent } from './components/rayo-scan/rayo-scan.component';
 import { LineChartComponent } from './components/line-chart/line-chart.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { DescriptionImageModalComponent } from './components/description-image-modal/description-image-modal.component';  // For accordion and expansion panel
+import { DescriptionImageModalComponent } from './components/description-image-modal/description-image-modal.component';
+import { RahSearchComponent } from './components/rah-search/rah-search.component';  // For accordion and expansion panel
 
 
 
@@ -36,7 +38,8 @@ import { DescriptionImageModalComponent } from './components/description-image-m
     CauseDialogComponent,
     RayoScanComponent,
     LineChartComponent,
-    DescriptionImageModalComponent
+    DescriptionImageModalComponent,
+    RahSearchComponent
   ],
   imports: [
     BrowserModule,
@@ -48,6 +51,7 @@ import { DescriptionImageModalComponent } from './components/description-image-m
     MatIconModule,
     MatExpansionModule,
     MatFormFieldModule,
+    ReactiveFormsModule,
     NgxSignaturePadModule,
  
     MatInputModule,

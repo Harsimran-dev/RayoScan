@@ -1,0 +1,17 @@
+/* Image wrapper */
+.image-wrapper {
+    width: 600px;
+    height: 600px;
+    overflow: hidden;
+    border-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Force image to stay inside 100px square */
+  .rah-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1rem;
+  }
+  

@@ -5,6 +5,7 @@ import * as XLSX from 'xlsx';
 interface RahRecord {
   description: string | null;
   image: string | null;
+  recommendation?: string | null;
 }
 
 @Injectable({
@@ -50,4 +51,19 @@ export class ExcelServiceService {
       return of(null);
     }
   }
+
+  getRahDetails(rahId: string): Observable<RahRecord | null> {
+    const record = this.excelData.find((row) => row['RAH ID'] === rahId);
+  
+    if (record) {
+      return of({
+        description: record['Description'] || null,
+        image: record['Image'] || null,
+        recommendation: record['Recommendation'] || null  // Adjust the key if your Excel column header differs
+      });
+    } else {
+      return of(null);
+    }
+  }
+  
 }
