@@ -24,7 +24,8 @@ import { CauseDialogComponent } from './components/cause-dialog/cause-dialog.com
 import { RayoScanComponent } from './components/rayo-scan/rayo-scan.component';
 import { LineChartComponent } from './components/line-chart/line-chart.component';
 import { MatIconModule } from '@angular/material/icon';
-import { MatExpansionModule } from '@angular/material/expansion';  // For accordion and expansion panel
+import { MatExpansionModule } from '@angular/material/expansion';
+import { DescriptionImageModalComponent } from './components/description-image-modal/description-image-modal.component';  // For accordion and expansion panel
 
 
 
@@ -34,7 +35,8 @@ import { MatExpansionModule } from '@angular/material/expansion';  // For accord
     WordReaderComponent,
     CauseDialogComponent,
     RayoScanComponent,
-    LineChartComponent
+    LineChartComponent,
+    DescriptionImageModalComponent
   ],
   imports: [
     BrowserModule,

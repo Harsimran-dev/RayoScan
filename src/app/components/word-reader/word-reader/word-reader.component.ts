@@ -812,21 +812,30 @@ Recommended: 1 Tablespoon per foot spa, ideally 2 foot spas per week
   
   
   
-
+  showModal = false;
+  modalCauseName = '';
+  modalDescription = '';
+  modalImageUrl?: string;
+  
   fetchExcelRecordPopup(rahId: string, name: string) {
-    this.excelService.searchRahId(rahId).subscribe(
-      (description: string | null) => {
-        if (description) {
-          const message =
-  `The detailed scan shows high energetic imbalances in:
-  
-  CAUSE: ${name.toUpperCase()}
-  Description: ${description}`;
-  
-          alert(message);
+    console.log("yes" + rahId);
+    this.excelService.searchRahIdandImage(rahId).subscribe(
+      (record: any) => {
+        console.log(record);
+        if (record && record.description) {
+          this.modalCauseName = name.toUpperCase();
+          this.modalDescription = record.description;
+          // Only set modalImageUrl if image is not null or empty
+          if (record.image) {
+            this.modalImageUrl = record.image;
+          } else {
+            this.modalImageUrl = ''; // or '' to clear previous image
+          }
+          this.showModal = true;
         } else {
           alert("No description found for RAH ID: " + rahId);
         }
+        
       },
       (error: any) => {
         console.error("❌ Error fetching record:", error);
@@ -834,8 +843,6 @@ Recommended: 1 Tablespoon per foot spa, ideally 2 foot spas per week
       }
     );
   }
-  
-  
   
   
   

@@ -17,6 +17,14 @@
 <button mat-button (click)="showRootCauses = !showRootCauses" style="margin-bottom: 10px;">
   {{ showRootCauses ? 'Hide Root Causes' : 'Show Root Causes' }}
 </button>
+<app-description-image-modal
+  *ngIf="showModal"
+  [causeName]="modalCauseName"
+  [description]="modalDescription"
+  [imageUrl]="modalImageUrl"
+  (closed)="showModal = false">
+</app-description-image-modal>
+
 
 
 <div id="printSection" *ngIf="clientData" style="margin-top: 20px; text-align: center;">

@@ -2,6 +2,11 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import * as XLSX from 'xlsx';
 
+interface RahRecord {
+  description: string | null;
+  image: string | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -31,5 +36,18 @@ export class ExcelServiceService {
   searchRahId(rahId: string): Observable<string | null> {
     const record = this.excelData.find((row) => row['RAH ID'] === rahId);
     return of(record ? record['Description'] : null);
+  }
+
+   searchRahIdandImage(rahId: string): Observable<RahRecord | null> {
+    const record = this.excelData.find((row) => row['RAH ID'] === rahId);
+
+    if (record) {
+      return of({
+        description: record['Description'] || null,
+        image: record['Image'] || null,  // Adjust this key based on your Excel column header
+      });
+    } else {
+      return of(null);
+    }
   }
 }

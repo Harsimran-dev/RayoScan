@@ -1,0 +1,12 @@
+<!-- description-image-modal.component.html -->
+<div class="modal-wrapper">
+  <div class="modal-backdrop"></div>
+
+  <!-- Click event only on wrapper, not the modal content -->
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>{{ causeName }}</h3>
+    <p>{{ description }}</p>
+    <img *ngIf="imageUrl" [src]="imageUrl" alt="Image" style="max-width: 100%; height: auto;" />
+    <button (click)="close()">Close</button>
+  </div>
+</div>
