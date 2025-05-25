@@ -306,6 +306,9 @@ ngOnInit(): void {
         this.processAminoAcidNameWithGemini(name);
       });
     }
+    else{
+      this.updateRecommendationText()
+    }
     
   
     // ✅ Fetch details for 100% entries
