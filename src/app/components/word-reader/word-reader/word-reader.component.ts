@@ -296,19 +296,21 @@ ngOnInit(): void {
     this.causeCodes = categoryCodes;
     this.countColors();
   
-    // ✅ Log all names under 'Amino acids'
-    if (categoryCodes["Amino acids"]) {
-      const aminoAcidNames = categoryCodes["Amino acids"].map(item => item.name);
-      console.log("🧪 Names under 'Amino acids':", aminoAcidNames);
+    const targetCauses = ["Acid-base balance", "Vital substances", "Harmful substances", "Enzymes", "Amino acids"];
+
+    targetCauses.forEach(targetCause => {
+      if (categoryCodes[targetCause]) {
+        const relevantItems = categoryCodes[targetCause].filter(item =>
+          item.percentage >= 60 && item.percentage <= 84
+        );
     
-      // 🔁 Send each name to Gemini service
-      aminoAcidNames.forEach(name => {
-        this.processAminoAcidNameWithGemini(name);
-      });
-    }
-    else{
-      this.updateRecommendationText()
-    }
+        relevantItems.forEach(item => {
+          this.processRecommendationFromExcel(item.code, item.name, targetCause); // 👈 now passes cause
+        });
+      }
+    });
+    
+    
     
   
     // ✅ Fetch details for 100% entries
@@ -326,31 +328,40 @@ ngOnInit(): void {
     this.updatePieChart();
   }
   
-  processAminoAcidNameWithGemini(name: string): void {
-    const prompt = `Provide information on how to naturally boost the amino acid ${name}. Limit the explanation to 60 words. Include food types that are alkaline and not acidic.`;
+  processRecommendationFromExcel(rahId: string, name: string, cause: string): void {
+    this.excelService.getRahDetails(rahId).subscribe({
+      next: (data) => {
+        const boldedName = this.toUnicodeBold(name);
+        const boldedCause = this.toUnicodeBold(cause);
+        const displayName = ` ${boldedCause} - ${boldedName}`;
   
-    this.geminiService.getGeneratedContent(prompt).subscribe({
-      next: (response: any) => {
-        console.log(`📩 Gemini raw response for ${name}:`, response);
+        if (data) {
+          const description = data.description || 'No description available.';
+          const recommendation = data.recommendation || 'No specific recommendation.';
+          const combined = `Description: ${description}\nRecommendation: ${recommendation}`;
+          this.aminoAcidInsights.push({ name: displayName, response: combined });
+        } else {
+          this.aminoAcidInsights.push({ name: displayName, response: 'No Excel data found.' });
+        }
   
-        // Safely extract the text
-        const text = response?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
-  
-        this.aminoAcidInsights.push({ name, response: text });
         this.updateRecommendationText();
       },
       error: (err) => {
-        console.error(`❌ Error from Gemini for ${name}:`, err);
-        this.aminoAcidInsights.push({ name, response: 'Failed to load data from Gemini.' });
+        console.error(`❌ Excel error for ${name}:`, err);
+        const displayName = `𝗖𝗔𝗨𝗦𝗘: ${this.toUnicodeBold(cause)} - ${this.toUnicodeBold(name)}`;
+        this.aminoAcidInsights.push({ name: displayName, response: 'Excel lookup failed.' });
       }
     });
   }
+  
+  
+  
 
   public recommendationText: string = '';
 
 updateRecommendationText(): void {
   let insightsText = this.aminoAcidInsights.map(insight =>
-    `Amino Acid: ${insight.name}\n${insight.response}\n`
+    ` ${insight.name}\n${insight.response}\n`
   ).join('\n');
 
   const staticRecommendations = `
