@@ -338,7 +338,7 @@ ngOnInit(): void {
         if (data) {
                 
 
-      
+          const description = data.description || 'No specific recommendation.';
           const recommendation = data.recommendation || 'No specific recommendation.';
           const combined = `Description: ${description}\nRecommendation: ${recommendation}`;
 
