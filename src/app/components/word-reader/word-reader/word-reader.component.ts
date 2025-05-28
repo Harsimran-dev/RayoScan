@@ -297,16 +297,26 @@ ngOnInit(): void {
     this.countColors();
   
     const targetCauses = ["Acid-base balance", "Vital substances", "Harmful substances", "Enzymes", "Amino acids"];
+    this.updateRecommendationText();
 
     targetCauses.forEach(targetCause => {
-      if (categoryCodes[targetCause]) {
-        const relevantItems = categoryCodes[targetCause].filter(item =>
-          item.percentage >= 60 && item.percentage <= 84
+      const causeItems = categoryCodes?.[targetCause];
+      
+      if (Array.isArray(causeItems)) {
+        const relevantItems = causeItems.filter(item =>
+          item && typeof item.percentage === 'number' && item.percentage >= 60 && item.percentage <= 84
         );
     
         relevantItems.forEach(item => {
-          this.processRecommendationFromExcel(item.code, item.name, targetCause); // 👈 now passes cause
+          try {
+            this.processRecommendationFromExcel(item.code, item.name, targetCause);
+          } catch (error) {
+            console.error(`❌ Error processing item [${item?.name}] in cause [${targetCause}]:`, error);
+            // Continue processing others
+          }
         });
+      } else {
+        console.warn(`⚠️ No valid data found for cause: ${targetCause}`);
       }
     });
     
