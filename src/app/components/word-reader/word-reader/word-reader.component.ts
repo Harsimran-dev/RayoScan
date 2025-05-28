@@ -336,9 +336,12 @@ ngOnInit(): void {
         const displayName = ` ${boldedCause} - ${boldedName}`;
   
         if (data) {
-          const description = data.description || 'No description available.';
+                    const description = data.description || 'No description available.';
+
+      
           const recommendation = data.recommendation || 'No specific recommendation.';
           const combined = `Description: ${description}\nRecommendation: ${recommendation}`;
+
           this.aminoAcidInsights.push({ name: displayName, response: combined });
         } else {
           this.aminoAcidInsights.push({ name: displayName, response: 'No Excel data found.' });
@@ -788,7 +791,16 @@ Recommended: 1 Tablespoon per foot spa, ideally 2 foot spas per week
           const lines = entry.split('\n');
           const causeLine = lines.find(line => line.startsWith('𝗖𝗔𝗨𝗦𝗘:')) || '';
           const nameLine = lines.find(line => line.startsWith('𝗡𝗔𝗠𝗘:')) || '';
-          const descLine = lines.find(line => line.trim().startsWith('Description:')) || '';
+          const startIndex = lines.findIndex(line => line.trim().startsWith('Description:'));
+          let descriptionBlock = '';
+          
+          if (startIndex !== -1) {
+            for (let i = startIndex; i < lines.length; i++) {
+              if (lines[i].trim().startsWith('Recommendation:') || lines[i].includes('====')) break;
+              descriptionBlock += lines[i] + '\n';
+            }
+          }
+          
   
           const name = nameLine.replace('𝗡𝗔𝗠𝗘:', '').trim();
           const cause = causeLine.replace('𝗖𝗔𝗨𝗦𝗘:', '').trim();
@@ -799,7 +811,7 @@ Recommended: 1 Tablespoon per foot spa, ideally 2 foot spas per week
           if (level === "90% - 100%") {
             const rawName = nameLine.replace('𝗡𝗔𝗠𝗘:', '').trim();
             const boldName = this.toUnicodeBold(rawName);
-            finalDescription += `${boldName} (${causeLine.replace('𝗖𝗔𝗨𝗦𝗘:', '').trim().toLowerCase()})\n\n${descLine}\n`;
+            finalDescription += `${boldName} (${causeLine.replace('𝗖𝗔𝗨𝗦𝗘:', '').trim().toLowerCase()})\n\n${descriptionBlock}\n`;
             finalDescription += `\n----------------------------------------\n\n`;
 
           } else {
