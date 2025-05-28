@@ -296,7 +296,7 @@ ngOnInit(): void {
     this.causeCodes = categoryCodes;
     this.countColors();
   
-    const targetCauses = ["Acid-base balance", "Vital substances", "Harmful substances", "Enzymes", "Amino acids"];
+    const targetCauses = ["Acid-base balance", "Vital substances",  "Enzymes", "Amino acids"];
     this.updateRecommendationText();
 
     targetCauses.forEach(targetCause => {
