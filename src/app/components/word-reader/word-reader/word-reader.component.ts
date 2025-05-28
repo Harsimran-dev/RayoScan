@@ -336,7 +336,7 @@ ngOnInit(): void {
         const displayName = ` ${boldedCause} - ${boldedName}`;
   
         if (data) {
-                    const description = data.description || 'No description available.';
+                
 
       
           const recommendation = data.recommendation || 'No specific recommendation.';
