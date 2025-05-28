@@ -336,9 +336,9 @@ ngOnInit(): void {
         const displayName = ` ${boldedCause} - ${boldedName}`;
   
         if (data) {
-          const description = data.description || 'No description available.';
+      
           const recommendation = data.recommendation || 'No specific recommendation.';
-          const combined = `Description: ${description}\nRecommendation: ${recommendation}`;
+          const combined = `Recommendation: ${recommendation}`;
           this.aminoAcidInsights.push({ name: displayName, response: combined });
         } else {
           this.aminoAcidInsights.push({ name: displayName, response: 'No Excel data found.' });

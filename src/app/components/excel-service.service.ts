@@ -59,7 +59,7 @@ export class ExcelServiceService {
       return of({
         description: record['Description'] || null,
         image: record['Image'] || null,
-        recommendation: record['Recommendation'] || null  // Adjust the key if your Excel column header differs
+        recommendation: record['recommendation'] || null  // Adjust the key if your Excel column header differs
       });
     } else {
       return of(null);
