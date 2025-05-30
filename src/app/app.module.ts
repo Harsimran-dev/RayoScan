@@ -27,7 +27,8 @@ import { LineChartComponent } from './components/line-chart/line-chart.component
 import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { DescriptionImageModalComponent } from './components/description-image-modal/description-image-modal.component';
-import { RahSearchComponent } from './components/rah-search/rah-search.component';  // For accordion and expansion panel
+import { RahSearchComponent } from './components/rah-search/rah-search.component';
+import { RahCombinationCheckerComponent } from './rah-combination-checker/rah-combination-checker.component';  // For accordion and expansion panel
 
 
 
@@ -39,7 +40,8 @@ import { RahSearchComponent } from './components/rah-search/rah-search.component
     RayoScanComponent,
     LineChartComponent,
     DescriptionImageModalComponent,
-    RahSearchComponent
+    RahSearchComponent,
+    RahCombinationCheckerComponent
   ],
   imports: [
     BrowserModule,

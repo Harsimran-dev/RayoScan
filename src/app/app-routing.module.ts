@@ -5,6 +5,7 @@ import { CauseDialogComponent } from './components/cause-dialog/cause-dialog.com
 import { RayoScanComponent } from './components/rayo-scan/rayo-scan.component';
 import { LineChartComponent } from './components/line-chart/line-chart.component';
 import { RahSearchComponent } from './components/rah-search/rah-search.component';
+import { RahCombinationCheckerComponent } from './rah-combination-checker/rah-combination-checker.component';
 
 const routes: Routes = [
   { path: 'word-reader', component: WordReaderComponent }, 
@@ -12,6 +13,7 @@ const routes: Routes = [
   { path: 'rayo-scan', component: RayoScanComponent },
   { path: 'line-chart', component: LineChartComponent },
   { path: 'search', component: RahSearchComponent },
+    { path: 'comb', component: RahCombinationCheckerComponent},
 
   // Redirect to Word Reader as default route
 
