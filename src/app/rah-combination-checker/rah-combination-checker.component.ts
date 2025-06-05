@@ -14,6 +14,13 @@ export class RahCombinationCheckerComponent {
   rahId2 = '';
   resultTwo: CombinationResult | null = null;
   notFoundTwo = false;
+  patientName: string = '';
+dob: string = '';
+
+printPage(): void {
+  window.print();
+}
+
 
   // For 3 RAH IDs
   rahId3_1 = '';
@@ -83,4 +90,24 @@ export class RahCombinationCheckerComponent {
       .replace(/^- /gm, '• ') // replace '- ' at line start with bullet
       .trim();
   }
+
+extractBefore(text: string, delimiter: string): string {
+  const index = text.toLowerCase().indexOf(delimiter.toLowerCase());
+  return index !== -1 ? text.slice(0, index).trim() : text;
+}
+
+extractBetween(text: string, start: string, end: string): string {
+  const lowerText = text.toLowerCase();
+  const startIndex = lowerText.indexOf(start.toLowerCase());
+  const endIndex = lowerText.indexOf(end.toLowerCase());
+  return (startIndex !== -1 && endIndex !== -1)
+    ? text.slice(startIndex + start.length, endIndex).trim()
+    : '';
+}
+
+extractAfter(text: string, delimiter: string): string {
+  const index = text.toLowerCase().indexOf(delimiter.toLowerCase());
+  return index !== -1 ? text.slice(index + delimiter.length).trim() : '';
+}
+
 }
