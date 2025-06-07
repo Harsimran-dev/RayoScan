@@ -162,6 +162,36 @@ extractAfterTwo(text: string): string {
   return '';
 }
 
+formatNames(names: string): string {
+  if (!names) return '';
+
+  // Remove surrounding parentheses if present
+  let trimmed = names.trim();
+  if (trimmed.startsWith('(') && trimmed.endsWith(')')) {
+    trimmed = trimmed.slice(1, -1);
+  }
+
+  // Split by comma followed by space and single quote:  ', '
+  // But safer to split by pattern "',"
+  // Using regex to split on ', ' only outside quotes would be complex,
+  // So let's split on `', '` which occurs between entries
+  const parts = trimmed.split(/',\s*/);
+
+  // Now add back the trailing quote on all but last (since split removes it)
+  for (let i = 0; i < parts.length - 1; i++) {
+    parts[i] = parts[i] + "'";
+  }
+
+  // Add a single quote to the first if missing (probably present, but just in case)
+  if (!parts[0].startsWith("'")) {
+    parts[0] = "'" + parts[0];
+  }
+
+  // Join with comma + line break
+  return parts.join(",<br>");
+}
+
+
 
 
 

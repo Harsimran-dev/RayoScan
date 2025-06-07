@@ -35,7 +35,8 @@
         <mat-card class="mt-4" style="background: #e3f2fd; color: #0d47a1;">
           <mat-card-title style="font-weight: bold;">Names</mat-card-title>
           <mat-card-content>
-            <p style="font-style: italic;">{{ resultTwo.combination }}</p>
+           <p style="font-style: italic;" [innerHTML]="formatNames(resultTwo.combination)"></p>
+
           </mat-card-content>
         </mat-card>
 
@@ -88,7 +89,8 @@
         <mat-card class="mt-4" style="background: #fff3e0; color: #bf360c;">
           <mat-card-title style="font-weight: bold;">Names</mat-card-title>
           <mat-card-content>
-            <p style="font-style: italic;">{{ resultThree.combination }}</p>
+          <p style="font-style: italic;" [innerHTML]="formatNames(resultThree.combination)"></p>
+
           </mat-card-content>
         </mat-card>
 
