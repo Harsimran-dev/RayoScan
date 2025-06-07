@@ -1,20 +1,20 @@
 <div class="container p-4">
   <h2>RAH Combination Checker</h2>
 
+  <!-- Patient Info -->
   <div class="row mb-4">
-  <div class="col-md-6">
-    <label for="patientName" class="form-label">Patient Name</label>
-    <input id="patientName" [(ngModel)]="patientName" name="patientName" class="form-control" />
+    <div class="col-md-6">
+      <label for="patientName" class="form-label">Patient Name</label>
+      <input id="patientName" [(ngModel)]="patientName" name="patientName" class="form-control" />
+    </div>
+    <div class="col-md-6">
+      <label for="dob" class="form-label">Date of Birth</label>
+      <input id="dob" type="date" [(ngModel)]="dob" name="dob" class="form-control" />
+    </div>
   </div>
-  <div class="col-md-6">
-    <label for="dob" class="form-label">Date of Birth</label>
-    <input id="dob" type="date" [(ngModel)]="dob" name="dob" class="form-control" />
-  </div>
-</div>
-
 
   <div class="row">
-    <!-- Two RAH IDs checker -->
+    <!-- Two RAH IDs Checker -->
     <div class="col-md-6">
       <h4>Check 2 RAH IDs Combination</h4>
 
@@ -30,42 +30,39 @@
 
       <button class="btn btn-primary mt-3" (click)="checkCombinationTwo()">Check Combination</button>
 
-      <mat-card *ngIf="resultTwo" class="mt-4" style="background: #e3f2fd; color: #0d47a1; font-family: 'Roboto', sans-serif;">
-        <mat-card-title style="font-weight: 700; font-size: 1.5rem;">Names</mat-card-title>
-        <mat-card-content>
-          <p style="font-size: 1.2rem; font-style: italic;">{{ resultTwo.combination }}</p>
-        </mat-card-content>
-      </mat-card>
+      <!-- Result for Two IDs -->
+      <ng-container *ngIf="resultTwo">
+        <mat-card class="mt-4" style="background: #e3f2fd; color: #0d47a1;">
+          <mat-card-title style="font-weight: bold;">Names</mat-card-title>
+          <mat-card-content>
+            <p style="font-style: italic;">{{ resultTwo.combination }}</p>
+          </mat-card-content>
+        </mat-card>
 
-      <mat-card *ngIf="resultTwo" class="mt-3" style="background: white; color: black; font-family: 'Georgia', serif;">
-        <mat-card-title style="font-weight: 700; font-size: 1.5rem;">Analysis</mat-card-title>
-        <mat-card-content>
-          <div style="white-space: pre-line; font-family: 'Courier New', monospace; font-size: 1rem; line-height: 1.4; margin-bottom: 1rem;">
-            {{ extractBefore(resultTwo.indication, 'Potential Indications:') }}
-          </div>
+        <mat-card class="mt-3" style="background: white;">
+          <mat-card-title style="font-weight: bold;">Analysis</mat-card-title>
+          <mat-card-content>
+            <div style="white-space: pre-line;">{{ analysisTwo }}</div>
 
-          <div style="background: #e1f5fe; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-            <h5 style="font-weight: bold; margin-bottom: 0.5rem;"> Potential Indications</h5>
-            <div style="white-space: pre-line; font-family: 'Courier New', monospace; font-size: 1rem;">
-              {{ extractBetween(resultTwo.indication, 'Potential Indications:', 'Recommendation for Rebalancing:') }}
+            <div class="mt-3 p-3" style="background-color: #e1f5fe; border-radius: 8px;">
+              <h5><strong>Potential Indications</strong></h5>
+              <div style="white-space: pre-line;">{{ potentialIndicationsTwo }}</div>
             </div>
-          </div>
 
-          <div style="background: #f1f8e9; padding: 1rem; border-radius: 8px;">
-            <h5 style="font-weight: bold; margin-bottom: 0.5rem;"> Recommendation for Rebalancing</h5>
-            <div style="white-space: pre-line; font-family: 'Courier New', monospace; font-size: 1rem;">
-              {{ extractAfter(resultTwo.indication, 'Recommendation for Rebalancing:') }}
+            <div class="mt-3 p-3" style="background-color: #f1f8e9; border-radius: 8px;">
+              <h5><strong>Recommendation for Rebalancing</strong></h5>
+              <div style="white-space: pre-line;">{{ recommendationTwo }}</div>
             </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
 
-      <div *ngIf="notFoundTwo" class="mt-3 text-danger" style="font-weight: 600;">
+      <div *ngIf="notFoundTwo" class="mt-3 text-danger fw-bold">
         No matching combination found.
       </div>
     </div>
 
-    <!-- Three RAH IDs checker -->
+    <!-- Three RAH IDs Checker -->
     <div class="col-md-6">
       <h4>Check 3 RAH IDs Combination</h4>
 
@@ -86,44 +83,41 @@
 
       <button class="btn btn-primary mt-3" (click)="checkCombinationThree()">Check Combination</button>
 
-      <mat-card *ngIf="resultThree" class="mt-4" style="background: #fff3e0; color: #bf360c; font-family: 'Roboto', sans-serif;">
-        <mat-card-title style="font-weight: 700; font-size: 1.5rem;">Names</mat-card-title>
-        <mat-card-content>
-          <p style="font-size: 1.2rem; font-style: italic;">{{ resultThree.combination }}</p>
-        </mat-card-content>
-      </mat-card>
+      <!-- Result for Three IDs -->
+      <ng-container *ngIf="resultThree">
+        <mat-card class="mt-4" style="background: #fff3e0; color: #bf360c;">
+          <mat-card-title style="font-weight: bold;">Names</mat-card-title>
+          <mat-card-content>
+            <p style="font-style: italic;">{{ resultThree.combination }}</p>
+          </mat-card-content>
+        </mat-card>
 
-      <mat-card *ngIf="resultThree" class="mt-3" style="background: #fffde7; color: #3e2723; font-family: 'Georgia', serif;">
-        <mat-card-title style="font-weight: 700; font-size: 1.5rem;">Analysis</mat-card-title>
-        <mat-card-content>
-          <div style="white-space: pre-line; font-family: 'Courier New', monospace; font-size: 1rem; line-height: 1.4; margin-bottom: 1rem;">
-            {{ extractBefore(resultThree.indication, 'Potential Indications:') }}
-          </div>
+        <mat-card class="mt-3" style="background: #fffde7;">
+          <mat-card-title style="font-weight: bold;">Analysis</mat-card-title>
+          <mat-card-content>
+            <div style="white-space: pre-line;">{{ analysisThree }}</div>
 
-          <div style="background: #e1f5fe; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-            <h5 style="font-weight: bold; margin-bottom: 0.5rem;"> Potential Indications</h5>
-            <div style="white-space: pre-line; font-family: 'Courier New', monospace; font-size: 1rem;">
-              {{ extractBetween(resultThree.indication, 'Potential Indications:', 'Recommendation for Rebalancing:') }}
+            <div class="mt-3 p-3" style="background-color: #e1f5fe; border-radius: 8px;">
+              <h5><strong>Potential Indications</strong></h5>
+              <div style="white-space: pre-line;">{{ potentialIndicationsThree }}</div>
             </div>
-          </div>
 
-          <div style="background: #f1f8e9; padding: 1rem; border-radius: 8px;">
-            <h5 style="font-weight: bold; margin-bottom: 0.5rem;"> Recommendation for Rebalancing</h5>
-            <div style="white-space: pre-line; font-family: 'Courier New', monospace; font-size: 1rem;">
-              {{ extractAfter(resultThree.indication, 'Recommendation for Rebalancing:') }}
+            <div class="mt-3 p-3" style="background-color: #f1f8e9; border-radius: 8px;">
+              <h5><strong>Recommendation for Rebalancing</strong></h5>
+              <div style="white-space: pre-line;">{{ recommendationThree }}</div>
             </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
 
-      <div *ngIf="notFoundThree" class="mt-3 text-danger" style="font-weight: 600;">
+      <div *ngIf="notFoundThree" class="mt-3 text-danger fw-bold">
         No matching combination found.
       </div>
     </div>
   </div>
 
+  <!-- Print Button -->
   <div class="text-center mt-5">
-  <button class="btn btn-outline-secondary" (click)="printPage()">🖨️ Print Page</button>
-</div>
-
+    <button class="btn btn-outline-secondary" (click)="printPage()">🖨️ Print Page</button>
+  </div>
 </div>
