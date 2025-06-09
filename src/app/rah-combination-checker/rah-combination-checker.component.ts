@@ -136,19 +136,31 @@ extractBetweenTwo(text: string): string {
   const startHeaders = ['potential indications', 'possible indications'];
   const endHeaders = ['recommendation for rebalancing', 'recommendations for rebalancing'];
 
+  const lowerText = text.toLowerCase();
+  console.log("Lowercase text:", lowerText);
+
   const startIndex = this.findFirstIndex(text, startHeaders);
   const endIndex = this.findFirstIndex(text, endHeaders);
 
-  if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
-    // Find matched header length to slice after header text
-    const lowerText = text.toLowerCase();
+  console.log("Start Index:", startIndex);
+  console.log("End Index:", endIndex);
 
-    const matchedStart = startHeaders.find(h => lowerText.indexOf(h) === startIndex)!;
-    return text.slice(startIndex + matchedStart.length).slice(0, endIndex - (startIndex + matchedStart.length)).trim();
+  if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
+    const matchedStart = startHeaders.find(h => lowerText.indexOf(h) === startIndex);
+    console.log("Matched Start Header:", matchedStart);
+
+    const headerLength = matchedStart?.length ?? 0;
+    const content = text.slice(startIndex + headerLength, endIndex).trim();
+
+    console.log("Extracted potential indications:", content);
+    return content;
   }
 
+  console.warn("Potential indications section not found.");
   return '';
 }
+
+
 
 extractAfterTwo(text: string): string {
   const recHeaders = ['recommendation for rebalancing', 'recommendations for rebalancing'];
