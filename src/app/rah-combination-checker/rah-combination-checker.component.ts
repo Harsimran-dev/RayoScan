@@ -57,7 +57,6 @@ export class RahCombinationCheckerComponent {
         indication: cleaned,
       };
 
-      // Use 2-combination extractors
       this.analysisTwo = this.extractBeforeTwo(cleaned);
       this.potentialIndicationsTwo = this.extractBetweenTwo(cleaned);
       this.recommendationTwo = this.extractAfterTwo(cleaned);
@@ -89,7 +88,6 @@ export class RahCombinationCheckerComponent {
         indication: cleaned,
       };
 
-      // Use 3-combination extractors
       this.analysisThree = this.extractBeforeThree(cleaned);
       this.potentialIndicationsThree = this.extractBetweenThree(cleaned);
       this.recommendationThree = this.extractAfterThree(cleaned);
@@ -104,112 +102,68 @@ export class RahCombinationCheckerComponent {
   cleanIndication(text: string): string {
     if (!text) return '';
     return text
-      .replace(/\*\*/g, '') // remove ** styling
-      .replace(/^- /gm, '• ') // replace '- ' with bullet
+      .replace(/\*\*/g, '')
+      .replace(/^- /gm, '• ')
       .trim();
   }
 
-
-  // --- Extractors for 2-combination ---
-// --- Extractors for 2-combination ---
-// Utility to find first occurring index of any given keywords in text (case-insensitive)
-// Utility to find the first occurrence of any header variant in text
-findFirstIndex(text: string, headers: string[]): number {
-  const lowerText = text.toLowerCase();
-  let minIndex = -1;
-  for (const header of headers) {
-    const idx = lowerText.indexOf(header.toLowerCase());
-    if (idx !== -1 && (minIndex === -1 || idx < minIndex)) {
-      minIndex = idx;
-    }
-  }
-  return minIndex;
-}
-
-extractBeforeTwo(text: string): string {
-  const headers = ['potential indications', 'possible indications'];
-  const idx = this.findFirstIndex(text, headers);
-  return idx !== -1 ? text.slice(0, idx).trim() : text.trim();
-}
-
-extractBetweenTwo(text: string): string {
-  const startHeaders = ['potential indications', 'possible indications'];
-  const endHeaders = ['recommendation for rebalancing', 'recommendations for rebalancing'];
-
-  const lowerText = text.toLowerCase();
-  console.log("Lowercase text:", lowerText);
-
-  const startIndex = this.findFirstIndex(text, startHeaders);
-  const endIndex = this.findFirstIndex(text, endHeaders);
-
-  console.log("Start Index:", startIndex);
-  console.log("End Index:", endIndex);
-
-  if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
-    const matchedStart = startHeaders.find(h => lowerText.indexOf(h) === startIndex);
-    console.log("Matched Start Header:", matchedStart);
-
-    const headerLength = matchedStart?.length ?? 0;
-    const content = text.slice(startIndex + headerLength, endIndex).trim();
-
-    console.log("Extracted potential indications:", content);
-    return content;
-  }
-
-  console.warn("Potential indications section not found.");
-  return '';
-}
-
-
-
-extractAfterTwo(text: string): string {
-  const recHeaders = ['recommendation for rebalancing', 'recommendations for rebalancing'];
-  const index = this.findFirstIndex(text, recHeaders);
-
-  if (index !== -1) {
+  findFirstIndex(text: string, headers: string[]): number {
     const lowerText = text.toLowerCase();
-    const matchedRec = recHeaders.find(h => lowerText.indexOf(h) === index)!;
-    return text.slice(index + matchedRec.length).trim();
-  }
-  return '';
-}
-
-formatNames(names: string): string {
-  if (!names) return '';
-
-  // Remove surrounding parentheses if present
-  let trimmed = names.trim();
-  if (trimmed.startsWith('(') && trimmed.endsWith(')')) {
-    trimmed = trimmed.slice(1, -1);
+    let minIndex = -1;
+    for (const header of headers) {
+      const idx = lowerText.indexOf(header.toLowerCase());
+      if (idx !== -1 && (minIndex === -1 || idx < minIndex)) {
+        minIndex = idx;
+      }
+    }
+    return minIndex;
   }
 
-  // Split by comma followed by space and single quote:  ', '
-  // But safer to split by pattern "',"
-  // Using regex to split on ', ' only outside quotes would be complex,
-  // So let's split on `', '` which occurs between entries
-  const parts = trimmed.split(/',\s*/);
-
-  // Now add back the trailing quote on all but last (since split removes it)
-  for (let i = 0; i < parts.length - 1; i++) {
-    parts[i] = parts[i] + "'";
+  extractBeforeTwo(text: string): string {
+    const headers = ['potential indications', 'possible indications'];
+    const idx = this.findFirstIndex(text, headers);
+    return idx !== -1 ? text.slice(0, idx).trim() : text.trim();
   }
 
-  // Add a single quote to the first if missing (probably present, but just in case)
-  if (!parts[0].startsWith("'")) {
-    parts[0] = "'" + parts[0];
+  extractBetweenTwo(text: string): string {
+    const startHeaders = ['potential indications', 'possible indications'];
+    const endHeaders = [
+      'recommendation for rebalancing',
+      'recommendations for rebalancing',
+      'recommendation for restoring balance',
+      'recommendations for restoring balance'
+    ];
+
+    const lowerText = text.toLowerCase();
+
+    const startIndex = this.findFirstIndex(text, startHeaders);
+    const endIndex = this.findFirstIndex(text, endHeaders);
+
+    if (startIndex !== -1) {
+      const matchedStart = startHeaders.find(h => lowerText.indexOf(h) === startIndex);
+      const startLength = matchedStart?.length ?? 0;
+
+      const endSliceIndex = (endIndex !== -1 && endIndex > startIndex) ? endIndex : text.length;
+      const content = text.slice(startIndex + startLength, endSliceIndex).trim();
+
+      return content;
+    }
+
+    return '';
   }
 
-  // Join with comma + line break
-  return parts.join(",<br>");
-}
+  extractAfterTwo(text: string): string {
+    const recHeaders = ['recommendation for rebalancing', 'recommendations for rebalancing', 'recommendation for restoring balance', 'recommendations for restoring balance'];
+    const index = this.findFirstIndex(text, recHeaders);
 
+    if (index !== -1) {
+      const lowerText = text.toLowerCase();
+      const matchedRec = recHeaders.find(h => lowerText.indexOf(h) === index)!;
+      return text.slice(index + matchedRec.length).trim();
+    }
+    return '';
+  }
 
-
-
-
-
-
-  // --- Extractors for 3-combination ---
   extractBeforeThree(text: string): string {
     const index = text.toLowerCase().indexOf('potential indications');
     return index !== -1 ? text.slice(0, index).trim() : text;
@@ -231,5 +185,25 @@ formatNames(names: string): string {
   extractAfterThree(text: string): string {
     const index = text.toLowerCase().indexOf('recommendation');
     return index !== -1 ? text.slice(index + 'recommendation'.length).trim() : '';
+  }
+
+  formatNames(names: string): string {
+    if (!names) return '';
+
+    let trimmed = names.trim();
+    if (trimmed.startsWith('(') && trimmed.endsWith(')')) {
+      trimmed = trimmed.slice(1, -1);
+    }
+
+    const parts = trimmed.split(/',\s*/);
+    for (let i = 0; i < parts.length - 1; i++) {
+      parts[i] += "'";
+    }
+
+    if (!parts[0].startsWith("'")) {
+      parts[0] = "'" + parts[0];
+    }
+
+    return parts.join(",<br>");
   }
 }
