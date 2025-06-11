@@ -8,16 +8,19 @@ import { CombinationThreeService } from '../combination-three-s.service';
   styleUrls: ['./rah-combination-checker.component.scss']
 })
 export class RahCombinationCheckerComponent {
+  // Patient Info
+  patientName: string = '';
+  dob: string = '';
+
   // For 2 RAH IDs
   rahId1 = '';
   rahId2 = '';
   resultTwo: CombinationResult | null = null;
   notFoundTwo = false;
-  patientName: string = '';
-  dob: string = '';
   analysisTwo: string = '';
   potentialIndicationsTwo: string = '';
   recommendationTwo: string = '';
+  potentialIndicationListTwo: string[] = [];
 
   // For 3 RAH IDs
   rahId3_1 = '';
@@ -28,6 +31,7 @@ export class RahCombinationCheckerComponent {
   analysisThree: string = '';
   potentialIndicationsThree: string = '';
   recommendationThree: string = '';
+  potentialIndicationListThree: string[] = [];
 
   constructor(
     private combinationService: CombinationService,
@@ -60,6 +64,7 @@ export class RahCombinationCheckerComponent {
       this.analysisTwo = this.extractBeforeTwo(cleaned);
       this.potentialIndicationsTwo = this.extractBetweenTwo(cleaned);
       this.recommendationTwo = this.extractAfterTwo(cleaned);
+      this.potentialIndicationListTwo = this.splitToLines(this.potentialIndicationsTwo);
 
       this.notFoundTwo = false;
     } else {
@@ -91,6 +96,7 @@ export class RahCombinationCheckerComponent {
       this.analysisThree = this.extractBeforeThree(cleaned);
       this.potentialIndicationsThree = this.extractBetweenThree(cleaned);
       this.recommendationThree = this.extractAfterThree(cleaned);
+      this.potentialIndicationListThree = this.splitToLines(this.potentialIndicationsThree);
 
       this.notFoundThree = false;
     } else {
@@ -103,8 +109,15 @@ export class RahCombinationCheckerComponent {
     if (!text) return '';
     return text
       .replace(/\*\*/g, '')
-      .replace(/^- /gm, '• ')
+      .replace(/^- /gm, '- ') // ensure bullet points are consistent
       .trim();
+  }
+
+  splitToLines(text: string): string[] {
+    return text
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
   }
 
   findFirstIndex(text: string, headers: string[]): number {
@@ -127,33 +140,22 @@ export class RahCombinationCheckerComponent {
 
   extractBetweenTwo(text: string): string {
     const startHeaders = ['potential indications', 'possible indications'];
-    const endHeaders = [
-      'recommendation for rebalancing',
-      'recommendations for rebalancing',
-      'recommendation for restoring balance',
-      'recommendations for restoring balance'
-    ];
-
-    const lowerText = text.toLowerCase();
+    const endHeaders = ['recommendation for rebalancing', 'recommendations for rebalancing'];
 
     const startIndex = this.findFirstIndex(text, startHeaders);
     const endIndex = this.findFirstIndex(text, endHeaders);
 
-    if (startIndex !== -1) {
-      const matchedStart = startHeaders.find(h => lowerText.indexOf(h) === startIndex);
-      const startLength = matchedStart?.length ?? 0;
-
-      const endSliceIndex = (endIndex !== -1 && endIndex > startIndex) ? endIndex : text.length;
-      const content = text.slice(startIndex + startLength, endSliceIndex).trim();
-
-      return content;
+    if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
+      const lowerText = text.toLowerCase();
+      const matchedStart = startHeaders.find(h => lowerText.indexOf(h) === startIndex)!;
+      return text.slice(startIndex + matchedStart.length, endIndex).trim();
     }
 
     return '';
   }
 
   extractAfterTwo(text: string): string {
-    const recHeaders = ['recommendation for rebalancing', 'recommendations for rebalancing', 'recommendation for restoring balance', 'recommendations for restoring balance'];
+    const recHeaders = ['recommendation for rebalancing', 'recommendations for rebalancing'];
     const index = this.findFirstIndex(text, recHeaders);
 
     if (index !== -1) {
@@ -189,21 +191,17 @@ export class RahCombinationCheckerComponent {
 
   formatNames(names: string): string {
     if (!names) return '';
-
     let trimmed = names.trim();
     if (trimmed.startsWith('(') && trimmed.endsWith(')')) {
       trimmed = trimmed.slice(1, -1);
     }
-
     const parts = trimmed.split(/',\s*/);
     for (let i = 0; i < parts.length - 1; i++) {
-      parts[i] += "'";
+      parts[i] = parts[i] + "'";
     }
-
     if (!parts[0].startsWith("'")) {
       parts[0] = "'" + parts[0];
     }
-
     return parts.join(",<br>");
   }
 }

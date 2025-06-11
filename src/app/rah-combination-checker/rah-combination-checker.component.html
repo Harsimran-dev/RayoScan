@@ -1,125 +1,124 @@
-<div class="container p-4">
+<div class="container mt-4">
   <h2>RAH Combination Checker</h2>
 
   <!-- Patient Info -->
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <label for="patientName" class="form-label">Patient Name</label>
-      <input id="patientName" [(ngModel)]="patientName" name="patientName" class="form-control" />
-    </div>
-    <div class="col-md-6">
-      <label for="dob" class="form-label">Date of Birth</label>
-      <input id="dob" type="date" [(ngModel)]="dob" name="dob" class="form-control" />
-    </div>
+  <div class="mb-4">
+    <label>Patient Name:</label>
+    <input type="text" [(ngModel)]="patientName" class="form-control mb-2" />
+
+    <label>Date of Birth:</label>
+    <input type="date" [(ngModel)]="dob" class="form-control" />
   </div>
 
+  <hr />
+
+  <!-- Two Columns for 2 RAH and 3 RAH Sections -->
   <div class="row">
-    <!-- Two RAH IDs Checker -->
+    <!-- Left Column: 2 RAH -->
     <div class="col-md-6">
-      <h4>Check 2 RAH IDs Combination</h4>
-
-      <div class="form-group">
-        <label>RAH ID 1:</label>
-        <input [(ngModel)]="rahId1" class="form-control" />
+      <h4>Check 2 RAH ID Combination</h4>
+      <div class="row mb-3">
+        <div class="col">
+          <input type="text" [(ngModel)]="rahId1" placeholder="RAH ID 1" class="form-control" />
+        </div>
+        <div class="col">
+          <input type="text" [(ngModel)]="rahId2" placeholder="RAH ID 2" class="form-control" />
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-primary" (click)="checkCombinationTwo()">Check</button>
+        </div>
       </div>
 
-      <div class="form-group mt-2">
-        <label>RAH ID 2:</label>
-        <input [(ngModel)]="rahId2" class="form-control" />
-      </div>
+      <div *ngIf="notFoundTwo" class="alert alert-danger">Combination not found.</div>
 
-      <button class="btn btn-primary mt-3" (click)="checkCombinationTwo()">Check Combination</button>
+      <div *ngIf="resultTwo">
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5><strong>Combination:</strong> {{ resultTwo.combination }}</h5>
+            <p><strong>Patient:</strong> {{ patientName }}</p>
+            <p><strong>DOB:</strong> {{ dob }}</p>
 
-      <!-- Result for Two IDs -->
-      <ng-container *ngIf="resultTwo">
-        <mat-card class="mt-4" style="background: #e3f2fd; color: #0d47a1;">
-          <mat-card-title style="font-weight: bold;">Names</mat-card-title>
-          <mat-card-content>
-           <p style="font-style: italic;" [innerHTML]="formatNames(resultTwo.combination)"></p>
-
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="mt-3" style="background: white;">
-          <mat-card-title style="font-weight: bold;">Analysis</mat-card-title>
-          <mat-card-content>
-            <div style="white-space: pre-line;">{{ analysisTwo }}</div>
+            <div class="mt-3 p-3" style="background-color: #f1f8e9; border-radius: 8px;">
+              <h5><strong>Analysis</strong></h5>
+              <p [innerHTML]="analysisTwo"></p>
+            </div>
 
             <div class="mt-3 p-3" style="background-color: #e1f5fe; border-radius: 8px;">
               <h5><strong>Potential Indications</strong></h5>
-              <div style="white-space: pre-line;">{{ potentialIndicationsTwo }}</div>
+              <div *ngFor="let line of potentialIndicationListTwo">
+                <ng-container *ngIf="line.startsWith('-'); else headerTwo">
+                  <label><input type="checkbox" /> {{ line.substring(2) }}</label>
+                </ng-container>
+                <ng-template #headerTwo>
+                  <strong>{{ line }}</strong>
+                </ng-template>
+              </div>
             </div>
 
-            <div class="mt-3 p-3" style="background-color: #f1f8e9; border-radius: 8px;">
-              <h5><strong>Recommendation for Rebalancing</strong></h5>
-              <div style="white-space: pre-line;">{{ recommendationTwo }}</div>
+            <div class="mt-3 p-3" style="background-color: #ede7f6; border-radius: 8px;">
+              <h5><strong>Recommendations for Rebalancing</strong></h5>
+              <p [innerHTML]="recommendationTwo"></p>
             </div>
-          </mat-card-content>
-        </mat-card>
-      </ng-container>
-
-      <div *ngIf="notFoundTwo" class="mt-3 text-danger fw-bold">
-        No matching combination found.
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Three RAH IDs Checker -->
+    <!-- Right Column: 3 RAH -->
     <div class="col-md-6">
-      <h4>Check 3 RAH IDs Combination</h4>
-
-      <div class="form-group">
-        <label>RAH ID 1:</label>
-        <input [(ngModel)]="rahId3_1" class="form-control" />
+      <h4>Check 3 RAH ID Combination</h4>
+      <div class="row mb-3">
+        <div class="col">
+          <input type="text" [(ngModel)]="rahId3_1" placeholder="RAH ID 1" class="form-control" />
+        </div>
+        <div class="col">
+          <input type="text" [(ngModel)]="rahId3_2" placeholder="RAH ID 2" class="form-control" />
+        </div>
+        <div class="col">
+          <input type="text" [(ngModel)]="rahId3_3" placeholder="RAH ID 3" class="form-control" />
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-primary" (click)="checkCombinationThree()">Check</button>
+        </div>
       </div>
 
-      <div class="form-group mt-2">
-        <label>RAH ID 2:</label>
-        <input [(ngModel)]="rahId3_2" class="form-control" />
-      </div>
+      <div *ngIf="notFoundThree" class="alert alert-danger">Combination not found.</div>
 
-      <div class="form-group mt-2">
-        <label>RAH ID 3:</label>
-        <input [(ngModel)]="rahId3_3" class="form-control" />
-      </div>
+      <div *ngIf="resultThree">
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5><strong>Combination:</strong> {{ resultThree.combination }}</h5>
+            <p><strong>Patient:</strong> {{ patientName }}</p>
+            <p><strong>DOB:</strong> {{ dob }}</p>
 
-      <button class="btn btn-primary mt-3" (click)="checkCombinationThree()">Check Combination</button>
-
-      <!-- Result for Three IDs -->
-      <ng-container *ngIf="resultThree">
-        <mat-card class="mt-4" style="background: #fff3e0; color: #bf360c;">
-          <mat-card-title style="font-weight: bold;">Names</mat-card-title>
-          <mat-card-content>
-          <p style="font-style: italic;" [innerHTML]="formatNames(resultThree.combination)"></p>
-
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="mt-3" style="background: #fffde7;">
-          <mat-card-title style="font-weight: bold;">Analysis</mat-card-title>
-          <mat-card-content>
-            <div style="white-space: pre-line;">{{ analysisThree }}</div>
+            <div class="mt-3 p-3" style="background-color: #f1f8e9; border-radius: 8px;">
+              <h5><strong>Analysis</strong></h5>
+              <p [innerHTML]="analysisThree"></p>
+            </div>
 
             <div class="mt-3 p-3" style="background-color: #e1f5fe; border-radius: 8px;">
               <h5><strong>Potential Indications</strong></h5>
-              <div style="white-space: pre-line;">{{ potentialIndicationsThree }}</div>
+              <div *ngFor="let line of potentialIndicationListThree">
+                <ng-container *ngIf="line.startsWith('-'); else headerThree">
+                  <label><input type="checkbox" /> {{ line.substring(2) }}</label>
+                </ng-container>
+                <ng-template #headerThree>
+                  <strong>{{ line }}</strong>
+                </ng-template>
+              </div>
             </div>
 
-            <div class="mt-3 p-3" style="background-color: #f1f8e9; border-radius: 8px;">
-              <h5><strong>Recommendation for Rebalancing</strong></h5>
-              <div style="white-space: pre-line;">{{ recommendationThree }}</div>
+            <div class="mt-3 p-3" style="background-color: #ede7f6; border-radius: 8px;">
+              <h5><strong>Recommendations for Rebalancing</strong></h5>
+              <p [innerHTML]="recommendationThree"></p>
             </div>
-          </mat-card-content>
-        </mat-card>
-      </ng-container>
-
-      <div *ngIf="notFoundThree" class="mt-3 text-danger fw-bold">
-        No matching combination found.
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
   <!-- Print Button -->
-  <div class="text-center mt-5">
-    <button class="btn btn-outline-secondary" (click)="printPage()">🖨️ Print Page</button>
+  <div class="text-center mt-4">
+    <button class="btn btn-secondary" (click)="printPage()">Print</button>
   </div>
 </div>
