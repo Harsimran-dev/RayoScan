@@ -21,6 +21,17 @@ export class RahCombinationCheckerComponent {
   potentialIndicationsTwo: string = '';
   recommendationTwo: string = '';
   potentialIndicationListTwo: string[] = [];
+  firstName: string = '';
+lastName: string = '';
+
+get fullName(): string {
+  return `${this.firstName} ${this.lastName}`.trim();
+}
+
+
+
+  // Track which 2 RAH checkboxes are checked
+  selectedIndicationsTwo: string[] = [];
 
   // For 3 RAH IDs
   rahId3_1 = '';
@@ -33,14 +44,97 @@ export class RahCombinationCheckerComponent {
   recommendationThree: string = '';
   potentialIndicationListThree: string[] = [];
 
+  // Track which 3 RAH checkboxes are checked
+  selectedIndicationsThree: string[] = [];
+
   constructor(
     private combinationService: CombinationService,
     private combinationThreeService: CombinationThreeService
   ) {}
+generatedPIT: string = '';
 
-  printPage(): void {
-    window.print();
+generatePIT(): void {
+  const randomSixDigit = Math.floor(Math.random() * 1_000_000); // 0 to 999999
+  const paddedNumber = randomSixDigit.toString().padStart(6, '0'); // ensure 6 digits
+  this.generatedPIT = `00${paddedNumber}`;
+}
+
+
+printPage(): void {
+  if (!this.generatedPIT || this.generatedPIT.trim() === '') {
+    alert('Please generate the PIT before printing.');
+    return; // stop execution if PIT not generated
   }
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
+
+  let html = `
+    <html>
+      <head>
+       <title>${this.firstName}_${this.generatedPIT}</title>
+
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h3 { margin-top: 30px; }
+          .section { margin-bottom: 20px; }
+          ul { list-style-type: disc; padding-left: 20px; }
+        </style>
+      </head>
+      <body>
+        <h2>RAH Combination Report</h2>
+        <p><strong>PIT Number:</strong> ${this.generatedPIT}</p>
+        <p><strong>Patient:</strong> ${this.firstName}${this.lastName}</p>
+        <p><strong>Date of Birth:</strong> ${this.dob}</p>
+  `;
+
+  // 2 RAH Section
+  if (this.resultTwo) {
+    html += `
+      <div class="section">
+        <h3>2 RAH Combination: ${this.resultTwo.combination}</h3>
+        <h4>Analysis</h4>
+        <p>${this.analysisTwo}</p>
+
+        <h4>Potential Indications</h4>
+        <ul>
+          ${this.selectedIndicationsTwo.map(line => `<li>${line}</li>`).join('')}
+        </ul>
+
+        <h4>Recommendations for Rebalancing</h4>
+        <p>${this.recommendationTwo}</p>
+      </div>
+    `;
+  }
+
+  // 3 RAH Section
+  if (this.resultThree) {
+    html += `
+      <div class="section">
+        <h3>3 RAH Combination: ${this.resultThree.combination}</h3>
+        <h4>Analysis</h4>
+        <p>${this.analysisThree}</p>
+
+        <h4>Potential Indications</h4>
+        <ul>
+          ${this.selectedIndicationsThree.map(line => `<li>${line}</li>`).join('')}
+        </ul>
+
+        <h4>Recommendations for Rebalancing</h4>
+        <p>${this.recommendationThree}</p>
+      </div>
+    `;
+  }
+
+  html += `
+      </body>
+    </html>
+  `;
+
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.print();
+}
+
 
   checkCombinationTwo(): void {
     const trimmedId1 = this.rahId1.trim();
@@ -67,6 +161,9 @@ export class RahCombinationCheckerComponent {
       this.potentialIndicationListTwo = this.splitToLines(this.potentialIndicationsTwo);
 
       this.notFoundTwo = false;
+
+      // Reset selected checkboxes on new result
+      this.selectedIndicationsTwo = [];
     } else {
       this.resultTwo = null;
       this.notFoundTwo = true;
@@ -99,6 +196,9 @@ export class RahCombinationCheckerComponent {
       this.potentialIndicationListThree = this.splitToLines(this.potentialIndicationsThree);
 
       this.notFoundThree = false;
+
+      // Reset selected checkboxes on new result
+      this.selectedIndicationsThree = [];
     } else {
       this.resultThree = null;
       this.notFoundThree = true;
@@ -109,7 +209,7 @@ export class RahCombinationCheckerComponent {
     if (!text) return '';
     return text
       .replace(/\*\*/g, '')
-      .replace(/^- /gm, '- ') // ensure bullet points are consistent
+      .replace(/^- /gm, '- ')
       .trim();
   }
 
@@ -187,6 +287,34 @@ export class RahCombinationCheckerComponent {
   extractAfterThree(text: string): string {
     const index = text.toLowerCase().indexOf('recommendation');
     return index !== -1 ? text.slice(index + 'recommendation'.length).trim() : '';
+  }
+
+  // Called when a 2 RAH checkbox changes
+  onCheckboxChangeTwo(line: string, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = line.substring(2).trim();
+
+    if (input.checked) {
+      if (!this.selectedIndicationsTwo.includes(value)) {
+        this.selectedIndicationsTwo.push(value);
+      }
+    } else {
+      this.selectedIndicationsTwo = this.selectedIndicationsTwo.filter(i => i !== value);
+    }
+  }
+
+  // Called when a 3 RAH checkbox changes
+  onCheckboxChangeThree(line: string, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = line.substring(2).trim();
+
+    if (input.checked) {
+      if (!this.selectedIndicationsThree.includes(value)) {
+        this.selectedIndicationsThree.push(value);
+      }
+    } else {
+      this.selectedIndicationsThree = this.selectedIndicationsThree.filter(i => i !== value);
+    }
   }
 
   formatNames(names: string): string {

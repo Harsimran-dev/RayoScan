@@ -10,25 +10,26 @@
   
     <div *ngIf="loading" class="text-gray-600 mt-2 loader">Searching...</div>
   
-    <div *ngIf="result" class="result-card w-full max-w-xl">
-      <div class="space-y-6 flex flex-col items-start">
+    <div *ngIf="result" class="result-card" style="width: 50%; margin-left: 4rem;">
+      <div class="space-y-6  items-start">
+  
+ <div class="w-[250px]">
+  <h2 class="text-xl font-semibold text-indigo-200 mb-1">Description</h2>
+  <p class="text-gray-700 text-justify leading-relaxed break-words">
+    {{ result.description || 'Not available' }}
+  </p>
+</div>
+
   
         <div class="w-[100px] overflow-hidden">
-          <h2 class="text-xl font-semibold text-indigo-600 mb-1">📘 Description</h2>
-          <p class="text-gray-700 text-justify leading-relaxed break-words">
-            {{ result.description || 'Not available' }}
-          </p>
-        </div>
-  
-        <div class="w-[100px] overflow-hidden">
-          <h2 class="text-xl font-semibold text-indigo-600 mb-1">📝 Recommendation</h2>
+          <h2 class="text-xl font-semibold text-indigo-600 mb-1"> Recommendation</h2>
           <p class="text-gray-700 text-justify leading-relaxed break-words">
             {{ result.recommendation || 'Not available' }}
           </p>
         </div>
   
         <div *ngIf="result.image" class="w-[300px]">
-          <h2 class="text-xl font-semibold text-indigo-600 mb-1">🖼️ Image</h2>
+          <h2 class="text-xl font-semibold text-indigo-600 mb-1"> Image</h2>
           <div class="image-wrapper">
             <img
               [src]="result.image"

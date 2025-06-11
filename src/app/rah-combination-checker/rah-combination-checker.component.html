@@ -2,13 +2,34 @@
   <h2>RAH Combination Checker</h2>
 
   <!-- Patient Info -->
-  <div class="mb-4">
-    <label>Patient Name:</label>
-    <input type="text" [(ngModel)]="patientName" class="form-control mb-2" />
-
-    <label>Date of Birth:</label>
-    <input type="date" [(ngModel)]="dob" class="form-control" />
+<!-- Patient Info -->
+<div class="mb-4">
+  <div class="row g-2">
+    <div class="col-4">
+      <label>First Name:</label>
+      <input type="text" [(ngModel)]="firstName" class="form-control form-control-sm" />
+    </div>
+    <div class="col-4">
+      <label>Last Name:</label>
+      <input type="text" [(ngModel)]="lastName" class="form-control form-control-sm" />
+    </div>
   </div>
+
+  <div class="mt-3" style="max-width: 250px;">
+    <label>Date of Birth:</label>
+    <input type="date" [(ngModel)]="dob" class="form-control form-control-sm" />
+  </div>
+
+  <!-- Generate PIT Section -->
+  <div class="mt-3">
+    <button class="btn btn-info btn-sm" (click)="generatePIT()">Generate PIT</button>
+    <div class="mt-2">
+      <strong>PIT:</strong> {{ generatedPIT }}
+    </div>
+  </div>
+</div>
+
+
 
   <hr />
 
@@ -47,7 +68,14 @@
               <h5><strong>Potential Indications</strong></h5>
               <div *ngFor="let line of potentialIndicationListTwo">
                 <ng-container *ngIf="line.startsWith('-'); else headerTwo">
-                  <label><input type="checkbox" /> {{ line.substring(2) }}</label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      (change)="onCheckboxChangeTwo(line, $event)"
+                      [checked]="selectedIndicationsTwo.includes(line.substring(2).trim())"
+                    />
+                    {{ line.substring(2) }}
+                  </label>
                 </ng-container>
                 <ng-template #headerTwo>
                   <strong>{{ line }}</strong>
@@ -100,7 +128,14 @@
               <h5><strong>Potential Indications</strong></h5>
               <div *ngFor="let line of potentialIndicationListThree">
                 <ng-container *ngIf="line.startsWith('-'); else headerThree">
-                  <label><input type="checkbox" /> {{ line.substring(2) }}</label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      (change)="onCheckboxChangeThree(line, $event)"
+                      [checked]="selectedIndicationsThree.includes(line.substring(2).trim())"
+                    />
+                    {{ line.substring(2) }}
+                  </label>
                 </ng-container>
                 <ng-template #headerThree>
                   <strong>{{ line }}</strong>
