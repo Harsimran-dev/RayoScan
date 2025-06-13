@@ -59,35 +59,70 @@ generatePIT(): void {
   this.generatedPIT = `00${paddedNumber}`;
 }
 
-
 printPage(): void {
   if (!this.generatedPIT || this.generatedPIT.trim() === '') {
     alert('Please generate the PIT before printing.');
-    return; // stop execution if PIT not generated
+    return;
   }
+
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
 
   let html = `
     <html>
       <head>
-       <title>${this.firstName}_${this.generatedPIT}</title>
-
+        <title>${this.firstName}_${this.generatedPIT}</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
+          body { font-family: Arial, sans-serif; padding: 20px; position: relative; }
+          h2 { margin-bottom: 10px; }
           h3 { margin-top: 30px; }
           .section { margin-bottom: 20px; }
           ul { list-style-type: disc; padding-left: 20px; }
+
+          .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            height: 40px;
+          }
+
+          .logo2 {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            height: 40px;
+          }
+
+          .highlight-card {
+            background-color: #fff3cd;
+            border-left: 6px solid #ffc107;
+            padding: 15px;
+            margin-top: 40px;
+            color: #856404;
+            font-size: 15px;
+            line-height: 1.6;
+          }
+
+          a { color: #0c5460; text-decoration: none; }
+
+          @media print {
+            .logo, .logo2 {
+              display: block;
+            }
+          }
         </style>
       </head>
       <body>
+        <!-- Logos -->
+        <img class="logo" src="assets/rayosoft.jpg" alt="Logo 1" />
+        <img class="logo2" src="assets/logo2.jpg" alt="Logo 2" />
+
         <h2>RAH Combination Report</h2>
         <p><strong>PIT Number:</strong> ${this.generatedPIT}</p>
-        <p><strong>Patient:</strong> ${this.firstName}${this.lastName}</p>
+        <p><strong>Patient:</strong> ${this.firstName} ${this.lastName}</p>
         <p><strong>Date of Birth:</strong> ${this.dob}</p>
   `;
 
-  // 2 RAH Section
   if (this.resultTwo) {
     html += `
       <div class="section">
@@ -106,7 +141,6 @@ printPage(): void {
     `;
   }
 
-  // 3 RAH Section
   if (this.resultThree) {
     html += `
       <div class="section">
@@ -125,6 +159,22 @@ printPage(): void {
     `;
   }
 
+  // ✨ Contact Info Section
+  html += `
+    <div class="highlight-card">
+      <strong>Note:</strong> If you would like to book a full body scan and see what the root causes are to your issues, then please contact us on:
+      <strong>01164 888 630</strong> to book an appointment, or email us at:
+      <strong><a href="mailto:info@thebioenergyclinic.co.uk">info@thebioenergyclinic.co.uk</a></strong>.
+      Please ensure when contacting us that you provide your <strong>PIT number</strong>.
+    </div>
+    <!-- ⚠️ Disclaimer Section -->
+    <div class="highlight-card" style="background-color: #f8d7da; border-left-color: #dc3545; color: #721c24;">
+      <strong>Disclaimer:</strong> This check-up report is based on cell energetics and in no way replaces a full medical report.
+      The practitioner's comments are based on the findings of the imbalances caused by
+      cell energetics in the body through the Rayoscan process.
+    </div>
+  `;
+
   html += `
       </body>
     </html>
@@ -132,6 +182,7 @@ printPage(): void {
 
   printWindow.document.write(html);
   printWindow.document.close();
+  printWindow.focus();
   printWindow.print();
 }
 
