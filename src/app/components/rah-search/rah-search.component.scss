@@ -17,3 +17,7 @@
   object-fit: cover;
   border-radius: 1rem;
 }
+.zoom-container {
+  max-height: 400px;
+  overflow: auto;
+}

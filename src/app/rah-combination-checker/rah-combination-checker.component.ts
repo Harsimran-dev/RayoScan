@@ -284,13 +284,23 @@ printPage(): void {
   }
 
   extractBeforeTwo(text: string): string {
-    const headers = ['potential indications', 'possible indications'];
+    const headers = [
+  'potential indications',
+  'possible indications',
+  'possible indications include',
+  'potential indications include'
+];
     const idx = this.findFirstIndex(text, headers);
     return idx !== -1 ? text.slice(0, idx).trim() : text.trim();
   }
 
   extractBetweenTwo(text: string): string {
-    const startHeaders = ['potential indications', 'possible indications'];
+  const startHeaders = [
+  'potential indications',
+  'possible indications',
+  'possible indications include',
+  'potential indications include'
+];
     const endHeaders = ['recommendation for rebalancing', 'recommendations for rebalancing'];
 
     const startIndex = this.findFirstIndex(text, startHeaders);
@@ -317,28 +327,63 @@ printPage(): void {
     return '';
   }
 
-  extractBeforeThree(text: string): string {
-    const index = text.toLowerCase().indexOf('potential indications');
-    return index !== -1 ? text.slice(0, index).trim() : text;
+extractBeforeThree(text: string): string {
+  const headers = [
+    'potential indications',
+    'possible indications',
+    'possible indications include',
+    'potential indications include'
+  ];
+  const idx = this.findFirstIndex(text, headers);
+  return idx !== -1 ? text.slice(0, idx).trim() : text.trim();
+}
+
+
+extractBetweenThree(text: string): string {
+  const startHeaders = [
+    'potential indications',
+    'possible indications',
+    'possible indications include',
+    'potential indications include'
+  ];
+  const endHeaders = [
+    'recommendation for rebalancing',
+    'recommendations for rebalancing',
+    'recommendation',
+    'recommendations'
+  ];
+
+  const lower = text.toLowerCase();
+  const startIndex = this.findFirstIndex(text, startHeaders);
+  const endIndex = this.findFirstIndex(text, endHeaders);
+
+  if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
+    const matchedStart = startHeaders.find(h => lower.indexOf(h) === startIndex)!;
+    return text.slice(startIndex + matchedStart.length, endIndex).trim();
   }
 
-  extractBetweenThree(text: string): string {
+  return '';
+}
+
+
+extractAfterThree(text: string): string {
+  const recHeaders = [
+    'recommendation for rebalancing',
+    'recommendations for rebalancing',
+    'recommendation',
+    'recommendations'
+  ];
+  const index = this.findFirstIndex(text, recHeaders);
+
+  if (index !== -1) {
     const lower = text.toLowerCase();
-    const start = 'potential indications';
-    const end = 'recommendation';
-    const startIndex = lower.indexOf(start);
-    const endIndex = lower.indexOf(end);
-
-    if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
-      return text.slice(startIndex + start.length, endIndex).trim();
-    }
-    return '';
+    const matched = recHeaders.find(h => lower.indexOf(h) === index)!;
+    return text.slice(index + matched.length).trim();
   }
 
-  extractAfterThree(text: string): string {
-    const index = text.toLowerCase().indexOf('recommendation');
-    return index !== -1 ? text.slice(index + 'recommendation'.length).trim() : '';
-  }
+  return '';
+}
+
 
   // Called when a 2 RAH checkbox changes
   onCheckboxChangeTwo(line: string, event: Event): void {
