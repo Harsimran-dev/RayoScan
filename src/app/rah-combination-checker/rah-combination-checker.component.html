@@ -139,24 +139,27 @@
       <h4>Check 3 RAH ID Combination</h4>
   <div class="row mb-3">
   <div class="col">
+      <label>RAH ID 1</label>
     <div class="input-group">
       <input type="text" [(ngModel)]="rahId3_1" placeholder="RAH ID 1" class="form-control" />
       <button class="btn btn-outline-secondary" type="button" (click)="listenForRah3_1()">🎤</button>
     </div>
   </div>
   <div class="col">
+      <label>RAH ID 2</label>
     <div class="input-group">
       <input type="text" [(ngModel)]="rahId3_2" placeholder="RAH ID 2" class="form-control" />
       <button class="btn btn-outline-secondary" type="button" (click)="listenForRah3_2()">🎤</button>
     </div>
   </div>
   <div class="col">
+      <label>RAH ID 3</label>
     <div class="input-group">
       <input type="text" [(ngModel)]="rahId3_3" placeholder="RAH ID 3" class="form-control" />
       <button class="btn btn-outline-secondary" type="button" (click)="listenForRah3_3()">🎤</button>
     </div>
   </div>
-  <div class="col-auto">
+  <div class="col-auto d-flex align-items-end">
     <button class="btn btn-primary" (click)="checkCombinationThree()">Check</button>
       <button class="btn btn-outline-danger" (click)="resetThree()">Reset</button>
   </div>
