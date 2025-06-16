@@ -184,6 +184,8 @@ printPage(): void {
         <p><strong>PIT Number:</strong> ${this.generatedPIT}</p>
         <p><strong>Patient:</strong> ${this.firstName} ${this.lastName}</p>
         <p><strong>Date of Birth:</strong> ${this.dob}</p>
+        <p><strong>Mobile Number:</strong> ${this.mobileNumber || 'N/A'}</p>
+        <p><strong>Email Address:</strong> ${this.email || 'N/A'}</p>
   `;
 
   if (this.resultTwo) {
@@ -222,7 +224,7 @@ printPage(): void {
     `;
   }
 
-  // ✨ Contact Info Section
+  // Contact Info Section
   html += `
     <div class="highlight-card">
       <strong>Note:</strong> If you would like to book a full body scan and see what the root causes are to your issues, then please contact us on:
@@ -230,7 +232,7 @@ printPage(): void {
       <strong><a href="mailto:info@thebioenergyclinic.co.uk">info@thebioenergyclinic.co.uk</a></strong>.
       Please ensure when contacting us that you provide your <strong>PIT number</strong>.
     </div>
-    <!-- ⚠️ Disclaimer Section -->
+    <!-- Disclaimer Section -->
     <div class="highlight-card" style="background-color: #f8d7da; border-left-color: #dc3545; color: #721c24;">
       <strong>Disclaimer:</strong> This check-up report is based on cell energetics and in no way replaces a full medical report.
       The practitioner's comments are based on the findings of the imbalances caused by
