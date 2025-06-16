@@ -10,85 +10,78 @@
   
     <div *ngIf="loading" class="text-gray-600 mt-2 loader">Searching...</div>
   
-    <div *ngIf="result" class="result-card" style="width: 50%; margin-left: 4rem;">
-      <div class="space-y-6  items-start">
-        <div class="w-[250px]">
-  <h2 class="text-xl font-semibold text-indigo-200 mb-1">Name</h2>
-  <p class="text-gray-700 text-justify leading-relaxed break-words">
-    {{ result.details|| 'Not available' }}
-  </p>
-</div>
-
-  
- <div class="w-[250px]">
-  <h2 class="text-xl font-semibold text-indigo-200 mb-1">Description</h2>
-  <p class="text-gray-700 text-justify leading-relaxed break-words">
-    {{ result.description || 'Not available' }}
-  </p>
-</div>
-
-  
-        <div class="w-[100px] overflow-hidden">
-          <h2 class="text-xl font-semibold text-indigo-600 mb-1"> Recommendation</h2>
-          <p class="text-gray-700 text-justify leading-relaxed break-words">
-            {{ result.recommendation || 'Not available' }}
-          </p>
-        </div>
-  
- <div *ngIf="result.image" class="w-[300px]">
-  <h2 class="text-xl font-semibold text-indigo-600 mb-1">Image</h2>
-
-  <!-- Zoom Buttons -->
- <!-- Zoom Controls -->
-<div class="flex gap-3 mb-4">
-  <button
-    (click)="zoomIn()"
-    class=" text-black text-lg font-bold px-4 py-2 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
-    title="Zoom In"
-  >
-    +
-  </button>
-  <button
-    (click)="zoomOut()"
-    class=" text-black text-lg font-bold px-4 py-2 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
-    title="Zoom Out"
-  >
-    −
-  </button>
-  <button
-    (click)="resetZoom()"
-    class=" text-black text-sm font-medium px-4 py-2 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
-    title="Reset Zoom"
-  >
-    Reset
-  </button>
-</div>
+<!-- Full width result container -->
+<div *ngIf="result" class="w-full max-w-6xl bg-white rounded-xl shadow-md p-6">
 
 
-  <!-- Draggable Zoomable Image -->
-  <div
-    class="zoom-container overflow-hidden border rounded shadow-md"
-    style="width: 100%; height: 300px; cursor: grab; position: relative;"
-    (mousedown)="startDragging($event)"
-    (mouseup)="stopDragging()"
-    (mouseleave)="stopDragging()"
-    (mousemove)="onDrag($event)"
-  >
-    <img
-      [src]="result.image"
-      alt="RAH Image"
-      class="rah-image"
-      [style.transform]="'scale(' + zoomLevel + ') translate(' + translateX + 'px, ' + translateY + 'px)'"
-      [style.transformOrigin]="'top left'"
-      style="transition: transform 0.2s ease; user-select: none;"
-      draggable="false"
-    />
-  </div>
-</div>
 
-  
-      </div>
+    <!-- 🟦 Column 1: Name -->
+    <div class="flex-1">
+      <h2 class="text-xl font-semibold text-indigo-600 mb-2">Name</h2>
+      <p class="text-gray-700 break-words">
+        {{ result.details || 'Not available' }}
+      </p>
     </div>
+
+    <!-- 🟩 Column 2: Description + Image -->
+  <!-- Outer container with 2 columns -->
+<div class="row">
+
+  <!-- Column 1: Description -->
+  <div class="col-6">
+    <h2 class="text-xl font-semibold text-indigo-600 mb-2">Description</h2>
+    <p class="text-gray-700 break-words">
+      {{ result.description || 'Not available' }}
+    </p>
+  </div>
+
+  <!-- Column 2: Image + Zoom -->
+  <div *ngIf="result.image" class="col-6">
+    <h2 class="text-xl font-semibold text-indigo-600 mb-2">Image</h2>
+
+    <!-- Zoom Controls -->
+    <div class="flex gap-2 mb-3">
+      <button (click)="zoomIn()" class="bg-blue-600 text-black px-3 py-1 rounded-full">+</button>
+      <button (click)="zoomOut()" class="bg-blue-600 text-black px-3 py-1 rounded-full">−</button>
+      <button (click)="resetZoom()" class="bg-gray-500 text-black px-3 py-1 rounded-full">Reset</button>
+    </div>
+
+    <!-- Zoomable Image -->
+    <div
+      class="overflow-hidden border rounded shadow"
+      style="height: 300px; position: relative; cursor: grab;"
+      (mousedown)="startDragging($event)"
+      (mouseup)="stopDragging()"
+      (mouseleave)="stopDragging()"
+      (mousemove)="onDrag($event)"
+    >
+      <img
+        [src]="result.image"
+        alt="RAH Image"
+        class="rah-image"
+        [style.transform]="'scale(' + zoomLevel + ') translate(' + translateX + 'px, ' + translateY + 'px)'"
+        [style.transformOrigin]="'top left'"
+        style="transition: transform 0.2s ease; user-select: none;"
+        draggable="false"
+      />
+    </div>
+  </div>
+
+</div>
+
+
+    <!-- 🟨 Column 3: Recommendation -->
+    <div class="flex-1">
+      <h2 class="text-xl font-semibold text-indigo-600 mb-2">Recommendation</h2>
+      <p class="text-gray-700 break-words">
+        {{ result.recommendation || 'Not available' }}
+      </p>
+    </div>
+
+
+</div>
+
+
   
     <div *ngIf="!result && !loading && rahIdControl.value" class="text-red-500 mt-4 no-result">
       No matching RAH ID found.

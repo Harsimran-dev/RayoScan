@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CombinationResult, CombinationService } from '../combination-service.service';
 import { CombinationThreeService } from '../combination-three-s.service';
+import { SpeechRecognitionService } from '../speech-recognition.service';
 
 @Component({
   selector: 'app-rah-combination-checker',
@@ -12,21 +13,82 @@ export class RahCombinationCheckerComponent {
   patientName: string = '';
   dob: string = '';
 
-  // For 2 RAH IDs
-  rahId1 = '';
-  rahId2 = '';
-  resultTwo: CombinationResult | null = null;
-  notFoundTwo = false;
-  analysisTwo: string = '';
-  potentialIndicationsTwo: string = '';
-  recommendationTwo: string = '';
-  potentialIndicationListTwo: string[] = [];
-  firstName: string = '';
+rahId1 = '';
+rahId2 = '';
+resultTwo: CombinationResult | null = null;
+notFoundTwo = false;
+analysisTwo: string = '';
+potentialIndicationsTwo: string = '';
+recommendationTwo: string = '';
+potentialIndicationListTwo: string[] = [];
+firstName: string = '';
 lastName: string = '';
+
+// Add these two
+mobileNumber: string = '';
+email: string = '';
+
+
+
+listenForRah1() {
+  this.speechService.startListening((transcript: string) => {
+    this.rahId1 = transcript.trim();
+  });
+}
+
+listenForRah2() {
+  this.speechService.startListening((transcript: string) => {
+    this.rahId2 = transcript.trim();
+  });
+}
+
+listenForRah3_1() {
+  this.speechService.startListening((transcript: string) => {
+    this.rahId3_1 = transcript.trim();
+  });
+}
+
+listenForRah3_2() {
+  this.speechService.startListening((transcript: string) => {
+    this.rahId3_2 = transcript.trim();
+  });
+}
+
+listenForRah3_3() {
+  this.speechService.startListening((transcript: string) => {
+    this.rahId3_3 = transcript.trim();
+  });
+}
+
 
 get fullName(): string {
   return `${this.firstName} ${this.lastName}`.trim();
 }
+resetTwo(): void {
+  this.rahId1 = '';
+  this.rahId2 = '';
+  this.resultTwo = null;
+  this.notFoundTwo = false;
+  this.analysisTwo = '';
+  this.potentialIndicationsTwo = '';
+  this.recommendationTwo = '';
+  this.potentialIndicationListTwo = [];
+  this.selectedIndicationsTwo = [];
+}
+
+resetThree(): void {
+  this.rahId3_1 = '';
+  this.rahId3_2 = '';
+  this.rahId3_3 = '';
+  this.resultThree = null;
+  this.notFoundThree = false;
+  this.analysisThree = '';
+  this.potentialIndicationsThree = '';
+  this.recommendationThree = '';
+  this.potentialIndicationListThree = [];
+  this.selectedIndicationsThree = [];
+}
+
 
 
 
@@ -49,7 +111,8 @@ get fullName(): string {
 
   constructor(
     private combinationService: CombinationService,
-    private combinationThreeService: CombinationThreeService
+    private combinationThreeService: CombinationThreeService,
+    private speechService: SpeechRecognitionService
   ) {}
 generatedPIT: string = '';
 
@@ -187,74 +250,93 @@ printPage(): void {
 }
 
 
-  checkCombinationTwo(): void {
-    const trimmedId1 = this.rahId1.trim();
-    const trimmedId2 = this.rahId2.trim();
+checkCombinationTwo(): void {
+  const trimmedId1 = this.rahId1.trim();
+  const trimmedId2 = this.rahId2.trim();
 
-    if (!trimmedId1 || !trimmedId2) {
-      this.resultTwo = null;
-      this.notFoundTwo = true;
-      return;
-    }
-
-    const match = this.combinationService.getCombinationAndIndication(trimmedId1, trimmedId2);
-
-    if (match) {
-      const cleaned = this.cleanIndication(match.indication || '');
-      this.resultTwo = {
-        combination: match.combination || '',
-        indication: cleaned,
-      };
-
-      this.analysisTwo = this.extractBeforeTwo(cleaned);
-      this.potentialIndicationsTwo = this.extractBetweenTwo(cleaned);
-      this.recommendationTwo = this.extractAfterTwo(cleaned);
-      this.potentialIndicationListTwo = this.splitToLines(this.potentialIndicationsTwo);
-
-      this.notFoundTwo = false;
-
-      // Reset selected checkboxes on new result
-      this.selectedIndicationsTwo = [];
-    } else {
-      this.resultTwo = null;
-      this.notFoundTwo = true;
-    }
+  if (!trimmedId1 || !trimmedId2) {
+    this.resultTwo = null;
+    this.notFoundTwo = true;
+    return;
   }
 
-  checkCombinationThree(): void {
-    const id1 = this.rahId3_1.trim();
-    const id2 = this.rahId3_2.trim();
-    const id3 = this.rahId3_3.trim();
+  const match = this.combinationService.getCombinationAndIndication(trimmedId1, trimmedId2);
 
-    if (!id1 || !id2 || !id3) {
-      this.resultThree = null;
-      this.notFoundThree = true;
-      return;
-    }
+  if (match) {
+    const cleaned = this.cleanIndication(match.indication || '');
 
-    const match = this.combinationThreeService.getCombinationAndIndication(id1, id2, id3);
+    // 🔥 Remove items that include "complete"
+    const filteredCombo = (match.combination || '')
+      .replace(/[\[\]()]/g, '') // remove brackets if present
+      .split(',')
+      .map(s => s.trim().replace(/^['"]|['"]$/g, '')) // remove quotes
+      .filter(s => !s.toLowerCase().includes('complete')) // remove if contains "complete"
+      .join(', ');
 
-    if (match) {
-      const cleaned = this.cleanIndication(match.indication || '');
-      this.resultThree = {
-        combination: match.combination || '',
-        indication: cleaned,
-      };
+    this.resultTwo = {
+      combination: filteredCombo,
+      indication: cleaned,
+    };
 
-      this.analysisThree = this.extractBeforeThree(cleaned);
-      this.potentialIndicationsThree = this.extractBetweenThree(cleaned);
-      this.recommendationThree = this.extractAfterThree(cleaned);
-      this.potentialIndicationListThree = this.splitToLines(this.potentialIndicationsThree);
+    this.analysisTwo = this.extractBeforeTwo(cleaned);
+    this.potentialIndicationsTwo = this.extractBetweenTwo(cleaned);
+    this.recommendationTwo = this.extractAfterTwo(cleaned);
+    this.potentialIndicationListTwo = this.splitToLines(this.potentialIndicationsTwo);
 
-      this.notFoundThree = false;
+    this.notFoundTwo = false;
 
-      // Reset selected checkboxes on new result
-      this.selectedIndicationsThree = [];
-    } else {
-      this.resultThree = null;
-      this.notFoundThree = true;
-    }
+    // Reset selected checkboxes on new result
+    this.selectedIndicationsTwo = [];
+  } else {
+    this.resultTwo = null;
+    this.notFoundTwo = true;
   }
+}
+
+checkCombinationThree(): void {
+  const id1 = this.rahId3_1.trim();
+  const id2 = this.rahId3_2.trim();
+  const id3 = this.rahId3_3.trim();
+
+  if (!id1 || !id2 || !id3) {
+    this.resultThree = null;
+    this.notFoundThree = true;
+    return;
+  }
+
+  const match = this.combinationThreeService.getCombinationAndIndication(id1, id2, id3);
+
+  if (match) {
+    const cleaned = this.cleanIndication(match.indication || '');
+
+    // 🔥 Filter out items that include "complete"
+    const filteredCombo = (match.combination || '')
+      .replace(/[\[\]()]/g, '') // remove brackets
+      .split(',')
+      .map(s => s.trim().replace(/^['"]|['"]$/g, '')) // remove leading/trailing quotes
+      .filter(s => !s.toLowerCase().includes('complete')) // remove "complete" entries
+      .join(', ');
+
+    this.resultThree = {
+      combination: filteredCombo,
+      indication: cleaned,
+    };
+
+    this.analysisThree = this.extractBeforeThree(cleaned);
+    this.potentialIndicationsThree = this.extractBetweenThree(cleaned);
+    this.recommendationThree = this.extractAfterThree(cleaned);
+    this.potentialIndicationListThree = this.splitToLines(this.potentialIndicationsThree);
+
+    this.notFoundThree = false;
+
+    // Reset selected checkboxes on new result
+    this.selectedIndicationsThree = [];
+  } else {
+    this.resultThree = null;
+    this.notFoundThree = true;
+  }
+}
+
 
   cleanIndication(text: string): string {
     if (!text) return '';
