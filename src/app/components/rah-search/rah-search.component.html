@@ -49,7 +49,7 @@
     <!-- Zoomable Image -->
     <div
       class="overflow-hidden border rounded shadow"
-      style="height: 600px; position: relative; cursor: grab;"
+      style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; overflow: hidden;"
       (mousedown)="startDragging($event)"
       (mouseup)="stopDragging()"
       (mouseleave)="stopDragging()"
