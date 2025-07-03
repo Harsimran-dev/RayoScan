@@ -25,7 +25,7 @@
 
     <!-- 🟩 Column 2: Description + Image -->
   <!-- Outer container with 2 columns -->
-<div class="row" style="height: 300px;">
+<div class="row" style="height: 500px;">
 
   <!-- Column 1: Description -->
   <div class="col-6" >
@@ -68,20 +68,21 @@
   </div>
 
 </div>
-<div class="row">
-   <div class="col-6">
-      <h2 class="text-xl font-semibold text-indigo-600 mb-2">Recommendation</h2>
-      <p class="text-gray-700 break-words">
-        {{ result.recommendation || 'Not available' }}
-      </p>
-    </div>
-</div>
+
 
 
     <!-- 🟨 Column 3: Recommendation -->
    
 
 
+</div>
+<div class="row mt-6">
+  <div class="col-6">
+    <h2 class="text-xl font-semibold text-indigo-600 mb-2">Recommendation</h2>
+    <p class="text-gray-700 break-words">
+      {{ result.recommendation || 'Not available' }}
+    </p>
+  </div>
 </div>
 
 
