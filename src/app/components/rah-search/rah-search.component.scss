@@ -1,23 +1,23 @@
 .image-wrapper {
-  width: 600px;
-  height: 600px;
+  width: 100%;
+  max-width: 600px; /* limits it on larger screens */
+  aspect-ratio: 4 / 3; /* Optional: Keep a standard ratio */
   overflow: hidden;
   border-radius: 1rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 auto; /* ✅ centers the wrapper */
+  margin: 0 auto;
+  position: relative;
 }
 
 .rah-image {
-  width: 1000px;
-  height: 500px;      /* Keep the image small */
+  width: 100%;
   height: auto;
-  object-fit: cover;
+  max-height: 100%;
+  object-fit: contain; /* ✅ Show full image without cropping */
   border-radius: 1rem;
-}
-.zoom-container {
-  max-height: 400px;
-  overflow: auto;
+  transition: transform 0.2s ease;
+  user-select: none;
 }

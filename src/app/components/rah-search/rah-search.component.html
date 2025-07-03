@@ -47,24 +47,24 @@
     </div>
 
     <!-- Zoomable Image -->
-    <div
-      class="overflow-hidden border rounded shadow"
-      style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; overflow: hidden;"
-      (mousedown)="startDragging($event)"
-      (mouseup)="stopDragging()"
-      (mouseleave)="stopDragging()"
-      (mousemove)="onDrag($event)"
-    >
-      <img
-        [src]="result.image"
-        alt="RAH Image"
-        class="rah-image"
-        [style.transform]="'scale(' + zoomLevel + ') translate(' + translateX + 'px, ' + translateY + 'px)'"
-        [style.transformOrigin]="'top left'"
-        style="transition: transform 0.2s ease; user-select: none ;height:600px;"
-        draggable="false"
-      />
-    </div>
+  <!-- Responsive Image Container -->
+<div
+  class="image-wrapper"
+  (mousedown)="startDragging($event)"
+  (mouseup)="stopDragging()"
+  (mouseleave)="stopDragging()"
+  (mousemove)="onDrag($event)"
+>
+  <img
+    [src]="result.image"
+    alt="RAH Image"
+    class="rah-image"
+    [style.transform]="'scale(' + zoomLevel + ') translate(' + translateX + 'px, ' + translateY + 'px)'"
+    [style.transformOrigin]="'center center'"
+    draggable="false"
+  />
+</div>
+
   </div>
 
 </div>
